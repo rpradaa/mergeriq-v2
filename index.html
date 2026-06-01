@@ -1,0 +1,421 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MergerIQ — AI-Powered Deal Screening</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&family=Fraunces:ital,opsz,wght@0,9..144,100;0,9..144,200;0,9..144,300;0,9..144,400;1,9..144,100;1,9..144,200;1,9..144,300;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0C0B09;--ink2:#27261F;--ink3:#6B6A60;--ink4:#A6A498;--ink5:#CFCDC3;
+  --cream:#F4F1E8;--cream2:#EEEAE0;--paper:#FAF7EF;--white:#FFFEFA;
+  --rule:#DCD8CB;--rule2:#E8E4D8;--rule3:#F0ECDF;
+  --red:#8B1A0E;--red2:#B5260E;--red-bg:rgba(139,26,14,0.07);
+  --green:#1A5C35;--green-bg:rgba(26,92,53,0.08);
+  --amber:#7A4A00;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Space Grotesk',sans-serif;
+  background:var(--cream);color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  font-size:13px;line-height:1.5;text-rendering:optimizeLegibility;
+}
+body::before{
+  content:'';position:fixed;inset:0;
+  background-image:radial-gradient(rgba(12,11,9,0.018) 1px,transparent 1px);
+  background-size:3px 3px;pointer-events:none;z-index:1;
+}
+
+/* ── TOP STRIP NAV (shared across pages) ── */
+.topnav{
+  position:sticky;top:0;z-index:200;
+  background:var(--ink);color:rgba(255,255,255,0.7);
+  height:34px;display:flex;align-items:center;justify-content:space-between;
+  font-family:'JetBrains Mono',monospace;font-size:10px;
+  letter-spacing:0.04em;border-bottom:1px solid #000;padding:0 22px;
+}
+.tn-l{display:flex;align-items:center;gap:14px}
+.tn-ld{width:5px;height:5px;border-radius:50%;background:#22C55E;
+  box-shadow:0 0 0 0 rgba(34,197,94,0.45);animation:tnpulse 2.2s ease infinite}
+@keyframes tnpulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.5)}50%{box-shadow:0 0 0 5px rgba(34,197,94,0)}}
+.tn-links{display:flex;align-items:center;gap:0}
+.tn-link{
+  color:rgba(255,255,255,0.55);text-decoration:none;
+  padding:0 16px;height:34px;display:flex;align-items:center;
+  letter-spacing:0.16em;text-transform:uppercase;font-size:9.5px;
+  border-left:1px solid rgba(255,255,255,0.1);transition:all 0.15s;
+}
+.tn-link:hover{color:#fff;background:rgba(255,255,255,0.04)}
+.tn-link.active{color:#fff}
+.tn-link.active::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--red2);margin-right:8px}
+
+/* ── HERO ── */
+.hero{
+  position:relative;z-index:2;
+  padding:0 0 0;
+  border-bottom:1px solid var(--rule);
+  overflow:hidden;
+}
+.hero-grid{
+  position:absolute;inset:0;
+  background-image:linear-gradient(var(--rule3) 1px,transparent 1px),linear-gradient(90deg,var(--rule3) 1px,transparent 1px);
+  background-size:46px 46px;
+  mask-image:radial-gradient(ellipse 80% 70% at 70% 30%,#000,transparent 75%);
+  -webkit-mask-image:radial-gradient(ellipse 80% 70% at 70% 30%,#000,transparent 75%);
+  opacity:0.7;pointer-events:none;
+}
+.hero-inner{
+  position:relative;
+  max-width:1280px;margin:0 auto;
+  padding:74px 48px 56px;
+  display:grid;grid-template-columns:1.35fr 1fr;gap:64px;align-items:center;
+}
+.hero-eyebrow{
+  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;
+  letter-spacing:0.22em;text-transform:uppercase;color:var(--ink4);
+  display:flex;align-items:center;gap:14px;margin-bottom:30px;
+}
+.hero-eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--red)}
+.hero-mark{display:flex;align-items:center;gap:14px;margin-bottom:34px}
+.hero-mark svg{width:42px;height:42px;overflow:visible}
+.hero-mark .hm-name{font-family:'Fraunces',serif;font-size:26px;font-weight:300;letter-spacing:-0.04em}
+.hero-mark .hm-name b{font-weight:400}
+.hero-h{
+  font-family:'Fraunces',serif;font-size:74px;font-weight:200;
+  letter-spacing:-0.045em;line-height:0.98;color:var(--ink);margin-bottom:28px;
+}
+.hero-h em{font-style:italic;color:var(--red);font-weight:300}
+.hero-sub{
+  font-family:'Fraunces',serif;font-size:19px;font-weight:300;
+  color:var(--ink2);line-height:1.5;max-width:54ch;
+  border-left:1px solid var(--ink);padding-left:18px;margin-bottom:36px;
+}
+.hero-cta{display:flex;gap:14px;align-items:center}
+.btn-primary{
+  display:inline-flex;align-items:center;gap:16px;
+  background:var(--ink);color:var(--cream);text-decoration:none;
+  padding:16px 24px;font-size:14px;font-weight:500;letter-spacing:0.01em;
+  position:relative;overflow:hidden;transition:background 0.2s;
+}
+.btn-primary::before{content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent);
+  transform:translateX(-100%);transition:transform 0.6s}
+.btn-primary:hover::before{transform:translateX(100%)}
+.btn-primary:hover{background:#000}
+.btn-primary .arr{font-family:'Fraunces',serif;font-style:italic;font-size:20px;font-weight:200}
+.btn-ghost{
+  display:inline-flex;align-items:center;gap:12px;
+  color:var(--ink);text-decoration:none;
+  padding:16px 22px;font-size:13px;font-weight:500;
+  letter-spacing:0.02em;border:1px solid var(--rule);transition:all 0.2s;
+}
+.btn-ghost:hover{border-color:var(--ink);background:var(--white)}
+
+/* Live panel */
+.hero-panel{
+  background:var(--white);border:1px solid var(--rule);position:relative;
+}
+.hp-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:12px 18px;border-bottom:1px solid var(--rule2);background:var(--paper);
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  letter-spacing:0.16em;text-transform:uppercase;color:var(--ink4);
+}
+.hp-bar .live{display:flex;align-items:center;gap:8px;color:var(--red)}
+.hp-bar .live::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--red);animation:tnpulse 1.6s ease infinite}
+.hp-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 20px;border-bottom:1px solid var(--rule2);
+}
+.hp-row:last-of-type{border-bottom:none}
+.hp-l{display:flex;flex-direction:column;gap:3px}
+.hp-name{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink4)}
+.hp-desc{font-size:11px;color:var(--ink3)}
+.hp-r{display:flex;align-items:baseline;gap:10px}
+.hp-v{font-family:'Fraunces',serif;font-size:30px;font-weight:300;font-style:italic;letter-spacing:-0.03em;color:var(--ink);line-height:1}
+.hp-d{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500}
+.hp-d.up{color:var(--green)}
+.hp-d.dn{color:var(--red)}
+.hp-foot{
+  padding:13px 20px;background:var(--ink);color:rgba(255,255,255,0.6);
+  font-family:'JetBrains Mono',monospace;font-size:9px;
+  letter-spacing:0.12em;display:flex;justify-content:space-between;align-items:center;
+}
+.hp-foot b{color:#fff;font-weight:500}
+
+/* Ticker under hero */
+.tickwrap{
+  background:var(--paper);border-bottom:1px solid var(--rule);
+  height:38px;display:flex;align-items:center;overflow:hidden;position:relative;z-index:2;
+  mask-image:linear-gradient(90deg,transparent,#000 3%,#000 97%,transparent);
+}
+.tick{display:flex;gap:40px;white-space:nowrap;animation:tickmove 80s linear infinite;padding-left:40px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink3)}
+@keyframes tickmove{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.tk{display:inline-flex;gap:8px;align-items:center}
+.tk b{color:var(--ink);font-weight:500}
+.tk .up{color:var(--green)}.tk .dn{color:var(--red)}
+
+/* ── SECTION SHELL ── */
+.band{
+  position:relative;z-index:2;max-width:1280px;margin:0 auto;padding:0 48px;
+}
+.band-h{
+  display:flex;align-items:baseline;justify-content:space-between;
+  padding:54px 0 22px;border-bottom:1px solid var(--ink);margin-bottom:0;
+}
+.band-h-l{display:flex;align-items:baseline;gap:18px}
+.band-num{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;color:var(--ink);letter-spacing:0.02em}
+.band-t{font-family:'Fraunces',serif;font-size:30px;font-weight:300;font-style:italic;letter-spacing:-0.02em}
+.band-h-r{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--ink3);letter-spacing:0.08em}
+
+/* Audience list */
+.aud{border-bottom:1px solid var(--rule2)}
+.aud-row{
+  display:grid;grid-template-columns:64px 280px 1fr 56px;gap:32px;align-items:center;
+  padding:30px 0;border-bottom:1px solid var(--rule2);
+  cursor:default;transition:background 0.2s,padding-left 0.25s;position:relative;
+}
+.aud-row:last-child{border-bottom:none}
+.aud-row::before{content:'';position:absolute;left:-48px;top:0;bottom:0;width:2px;background:var(--red);transform:scaleY(0);transform-origin:top;transition:transform 0.3s}
+.aud-row:hover::before{transform:scaleY(1)}
+.aud-row:hover{background:var(--paper)}
+.aud-n{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink4);letter-spacing:0.1em}
+.aud-name{
+  font-family:'Fraunces',serif;font-size:27px;font-weight:300;letter-spacing:-0.02em;color:var(--ink);line-height:1.05;
+}
+.aud-name .tag{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink4);margin-top:8px}
+.aud-desc{font-size:14px;color:var(--ink2);line-height:1.6;max-width:62ch}
+.aud-desc em{font-style:italic;color:var(--red);font-weight:400}
+.aud-arr{font-family:'Fraunces',serif;font-size:26px;font-style:italic;font-weight:200;color:var(--ink5);text-align:right;transition:color 0.2s,transform 0.2s}
+.aud-row:hover .aud-arr{color:var(--red);transform:translateX(4px)}
+
+/* Stats strip */
+.stats{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border:1px solid var(--rule);background:var(--white);margin:48px 0 0;
+}
+.stat{padding:28px 26px;border-right:1px solid var(--rule2)}
+.stat:last-child{border-right:none}
+.stat-l{font-family:'JetBrains Mono',monospace;font-size:8.5px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink4);margin-bottom:12px}
+.stat-v{font-family:'Fraunces',serif;font-size:46px;font-weight:200;font-style:italic;letter-spacing:-0.04em;color:var(--ink);line-height:1}
+.stat-v.g{color:var(--green)}
+.stat-d{font-size:11px;color:var(--ink3);margin-top:10px;line-height:1.5}
+
+/* Final CTA */
+.final{
+  position:relative;z-index:2;margin:64px 0 0;
+  background:var(--ink);color:var(--cream);overflow:hidden;
+}
+.final-inner{max-width:1280px;margin:0 auto;padding:56px 48px;display:grid;grid-template-columns:1fr auto;gap:48px;align-items:center}
+.final::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red)}
+.final-eyebrow{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-bottom:14px;display:flex;align-items:center;gap:12px}
+.final-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--red2);animation:tnpulse 1.8s ease infinite}
+.final-h{font-family:'Fraunces',serif;font-size:42px;font-weight:200;font-style:italic;letter-spacing:-0.035em;line-height:1.05;color:var(--cream)}
+.final-h b{font-style:normal;font-weight:300}
+.btn-light{
+  display:inline-flex;align-items:center;gap:16px;background:var(--cream);color:var(--ink);
+  text-decoration:none;padding:18px 28px;font-size:14px;font-weight:500;transition:all 0.2s;
+}
+.btn-light:hover{background:#fff;transform:translateX(3px)}
+.btn-light .arr{font-family:'Fraunces',serif;font-style:italic;font-size:22px;font-weight:200}
+
+.foot{
+  position:relative;z-index:2;max-width:1280px;margin:0 auto;
+  padding:30px 48px;display:flex;justify-content:space-between;
+  font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink4);
+  letter-spacing:0.1em;text-transform:uppercase;
+}
+.foot a{color:var(--ink3);text-decoration:none}
+
+/* reveal */
+.rv{opacity:0;transform:translateY(14px);transition:opacity 0.7s cubic-bezier(0.4,0,0.2,1),transform 0.7s cubic-bezier(0.4,0,0.2,1)}
+.rv.in{opacity:1;transform:translateY(0)}
+
+::-webkit-scrollbar{width:5px;height:5px}
+::-webkit-scrollbar-thumb{background:var(--rule);border-radius:2px}
+
+@media(max-width:980px){
+  .hero-inner{grid-template-columns:1fr;gap:40px}
+  .hero-h{font-size:54px}
+  .aud-row{grid-template-columns:40px 1fr;gap:16px}
+  .aud-desc,.aud-arr{grid-column:1/-1}
+  .aud-arr{display:none}
+  .stats{grid-template-columns:1fr 1fr}
+  .final-inner{grid-template-columns:1fr;gap:28px}
+}
+</style>
+</head>
+<body>
+
+<!-- TOP NAV -->
+<div class="topnav">
+  <div class="tn-l">
+    <span class="tn-ld"></span>
+    <span id="clock">LIVE · MARKETS OPEN</span>
+  </div>
+  <div class="tn-links">
+    <a class="tn-link active" href="index.html">Home</a>
+    <a class="tn-link" href="MergerIQ.html">The Screener</a>
+    <a class="tn-link" href="Academy.html">Academy</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-grid"></div>
+  <div class="hero-inner">
+    <div>
+      <div class="hero-mark">
+        <svg viewBox="0 0 36 36">
+          <line x1="2" y1="28" x2="34" y2="28" stroke="#0C0B09" stroke-width="1.3"/>
+          <line x1="6" y1="6" x2="18" y2="28" stroke="#0C0B09" stroke-width="1.7" stroke-linecap="round"/>
+          <line x1="30" y1="6" x2="18" y2="28" stroke="#0C0B09" stroke-width="1.7" stroke-linecap="round"/>
+          <circle cx="18" cy="28" r="2.6" fill="#0C0B09"/>
+          <line x1="26" y1="22" x2="26" y2="33" stroke="#8B1A0E" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="1.4 1.6"/>
+        </svg>
+        <span class="hm-name"><b>Merger</b>IQ</span>
+      </div>
+      <div class="hero-eyebrow"><span class="dot"></span><span>AI · Finance · Real-Time Markets</span></div>
+      <h1 class="hero-h">Know if a deal<br/>will close —<br/><em>before</em> you start.</h1>
+      <p class="hero-sub">MergerIQ is AI-powered deal screening for the moment before due diligence. Enter the terms and get a completion probability, kill criteria, comparable transactions, and a board-ready memo — in seconds, not weeks.</p>
+      <div class="hero-cta">
+        <a class="btn-primary" href="MergerIQ.html"><span>Try it now</span><span class="arr">→</span></a>
+        <a class="btn-ghost" href="Academy.html">Learn M&amp;A at the Academy</a>
+      </div>
+    </div>
+
+    <!-- LIVE PANEL -->
+    <div class="hero-panel">
+      <div class="hp-bar"><span>Live Market Signals</span><span class="live">Streaming</span></div>
+      <div class="hp-row">
+        <div class="hp-l"><span class="hp-name">VIX · Volatility</span><span class="hp-desc">Market fear index</span></div>
+        <div class="hp-r"><span class="hp-v" id="lvVix">16.7</span><span class="hp-d dn">−0.4</span></div>
+      </div>
+      <div class="hp-row">
+        <div class="hp-l"><span class="hp-name">10Y Treasury</span><span class="hp-desc">Cost of financing</span></div>
+        <div class="hp-r"><span class="hp-v" id="lvRate">4.48%</span><span class="hp-d up">+3bp</span></div>
+      </div>
+      <div class="hp-row">
+        <div class="hp-l"><span class="hp-name">SaaS · EV/Rev</span><span class="hp-desc">Sector multiple</span></div>
+        <div class="hp-r"><span class="hp-v">23.3×</span><span class="hp-d up">+2.4×</span></div>
+      </div>
+      <div class="hp-foot"><span>Feeds adjust every prediction in real time</span><span id="hpClock">14:32:08</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="tickwrap"><div class="tick" id="ticker"></div></div>
+
+<!-- WHO IT'S FOR -->
+<div class="band">
+  <div class="band-h rv">
+    <div class="band-h-l"><span class="band-num">§ 01</span><span class="band-t">Who it's for</span></div>
+    <div class="band-h-r">Five seats at the deal table</div>
+  </div>
+  <div class="aud">
+    <div class="aud-row rv">
+      <div class="aud-n">01</div>
+      <div class="aud-name">Buyers<span class="tag">Acquirers · Corp Dev</span></div>
+      <div class="aud-desc">If you are looking to acquire a company, MergerIQ helps you <em>screen deals instantly</em> — giving you a completion probability, regulatory risk assessment, and comparable transactions before you commit resources to due diligence.</div>
+      <div class="aud-arr">→</div>
+    </div>
+    <div class="aud-row rv">
+      <div class="aud-n">02</div>
+      <div class="aud-name">Sellers<span class="tag">Founders · Exits</span></div>
+      <div class="aud-desc">If you are exploring an exit, MergerIQ shows you how acquirers will evaluate your business — <em>what multiples are being paid</em> in your sector, what deal structures are succeeding, and what red flags could kill a deal.</div>
+      <div class="aud-arr">→</div>
+    </div>
+    <div class="aud-row rv">
+      <div class="aud-n">03</div>
+      <div class="aud-name">Transactions<span class="tag">Initial Screening</span></div>
+      <div class="aud-desc">MergerIQ fits into the earliest stage of the deal process — the initial screening. Before bankers are engaged and before advisors are hired, MergerIQ gives you a <em>data-driven view</em> of whether a deal is worth pursuing.</div>
+      <div class="aud-arr">→</div>
+    </div>
+    <div class="aud-row rv">
+      <div class="aud-n">04</div>
+      <div class="aud-name">M&amp;A Advisory Firms<span class="tag">Bankers · Boutiques</span></div>
+      <div class="aud-desc">For bankers and boutique advisors, MergerIQ is a deal screening tool you can use with clients — fast, data-backed, and presentation-ready. Run a deal through MergerIQ before your first client meeting and <em>walk in with numbers</em>.</div>
+      <div class="aud-arr">→</div>
+    </div>
+    <div class="aud-row rv">
+      <div class="aud-n">05</div>
+      <div class="aud-name">Third Party Intermediaries<span class="tag">Legal · Accounting · DD</span></div>
+      <div class="aud-desc">For lawyers, accountants, and due diligence firms, MergerIQ provides early deal context — regulatory risk, market conditions, and deal structure analysis — so you can <em>advise clients more confidently</em> from day one.</div>
+      <div class="aud-arr">→</div>
+    </div>
+  </div>
+</div>
+
+<!-- MODEL -->
+<div class="band">
+  <div class="band-h rv">
+    <div class="band-h-l"><span class="band-num">§ 02</span><span class="band-t">Under the model</span></div>
+    <div class="band-h-r">Trained on real outcomes</div>
+  </div>
+  <div class="stats rv">
+    <div class="stat"><div class="stat-l">Training set</div><div class="stat-v">98</div><div class="stat-d">Hand-curated M&amp;A deals, 2015–2025, across 8 sectors</div></div>
+    <div class="stat"><div class="stat-l">Cross-val accuracy</div><div class="stat-v g">85.5%</div><div class="stat-d">Strong, well-calibrated performance on held-out data</div></div>
+    <div class="stat"><div class="stat-l">ROC-AUC</div><div class="stat-v g">0.821</div><div class="stat-d">On held-out test data</div></div>
+    <div class="stat"><div class="stat-l">Deal memos</div><div class="stat-v" style="font-size:34px">AI</div><div class="stat-d">Every deal comes with an AI-drafted memo — thesis, risks, recommendation</div></div>
+  </div>
+</div>
+
+<!-- FINAL CTA -->
+<section class="final">
+  <div class="final-inner">
+    <div>
+      <div class="final-eyebrow"><span class="dot"></span><span>Free in beta</span></div>
+      <div class="final-h">Screen your first deal in <b>under a minute.</b></div>
+    </div>
+    <a class="btn-light" href="MergerIQ.html"><span>Open the Screener</span><span class="arr">→</span></a>
+  </div>
+</section>
+
+<div class="foot">
+  <span>© 2026 MergerIQ · Proprietary &amp; confidential · Patent pending</span>
+  <span>Built by Riya Pradhan · Georgetown McDonough MSBA '26</span>
+  <span><a href="MergerIQ.html">Try it →</a></span>
+</div>
+
+<script>
+// Clock
+function pad(n){return String(n).padStart(2,'0')}
+function tickClock(){
+  const d=new Date();
+  const t=pad(d.getHours())+':'+pad(d.getMinutes())+':'+pad(d.getSeconds());
+  const hp=document.getElementById('hpClock'); if(hp) hp.textContent=t+' EST';
+}
+setInterval(tickClock,1000); tickClock();
+
+// Gentle live jitter on hero panel values
+function jitter(){
+  const vix=document.getElementById('lvVix');
+  const rate=document.getElementById('lvRate');
+  if(vix){const v=(16.7+(Math.random()-0.5)*0.3).toFixed(1); vix.textContent=v;}
+  if(rate){const r=(4.48+(Math.random()-0.5)*0.04).toFixed(2); rate.textContent=r+'%';}
+}
+setInterval(jitter,2600);
+
+// Ticker
+(function(){
+  const items=[
+    {s:'VIX',v:'16.7',d:'−0.4',up:false},{s:'10Y',v:'4.48%',d:'+3bp',up:true},
+    {s:'SaaS EV/Rev',v:'23.3×',d:'+2.4×',up:true},{s:'SPX',v:'5,748',d:'+0.34%',up:true},
+    {s:'NDX',v:'20,431',d:'+0.51%',up:true},{s:'Fintech EV/Rev',v:'11.2×',d:'+0.6×',up:true},
+    {s:'Hardware EV/EBITDA',v:'14.8×',d:'−0.3×',up:false},{s:'Healthcare EV/Rev',v:'6.4×',d:'+0.2×',up:true},
+    {s:'DXY',v:'103.4',d:'+0.12%',up:true},{s:'M&A vol YTD',v:'$1.34T',d:'+8.2%',up:true},
+  ];
+  const html=items.map(i=>`<span class="tk">${i.s} <b>${i.v}</b> <span class="${i.up?'up':'dn'}">${i.d}</span></span>`).join('');
+  document.getElementById('ticker').innerHTML=html+html;
+})();
+
+// Reveal on scroll
+const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:0.15});
+document.querySelectorAll('.rv').forEach((el,i)=>{el.style.transitionDelay=(i%5*60)+'ms';io.observe(el)});
+</script>
+</body>
+</html>

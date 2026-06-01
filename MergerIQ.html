@@ -1,0 +1,3095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MergerIQ — Case 042</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&family=Fraunces:ital,opsz,wght@0,9..144,100;0,9..144,200;0,9..144,300;0,9..144,400;1,9..144,100;1,9..144,200;1,9..144,300;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+
+:root{
+  --ink:#0C0B09;
+  --ink2:#27261F;
+  --ink3:#6B6A60;
+  --ink4:#A6A498;
+  --ink5:#CFCDC3;
+  --cream:#F4F1E8;
+  --cream2:#EEEAE0;
+  --paper:#FAF7EF;
+  --white:#FFFEFA;
+  --rule:#DCD8CB;
+  --rule2:#E8E4D8;
+  --rule3:#F0ECDF;
+  --red:#8B1A0E;
+  --red2:#B5260E;
+  --red-bg:rgba(139,26,14,0.07);
+  --green:#1A5C35;
+  --green-bg:rgba(26,92,53,0.08);
+  --amber:#7A4A00;
+  --amber-bg:rgba(122,74,0,0.08);
+  --signal:#3D2EFF;
+}
+
+html{scroll-behavior:smooth}
+body{
+  font-family:'Space Grotesk',sans-serif;
+  background:var(--cream);
+  color:var(--ink);
+  -webkit-font-smoothing:antialiased;
+  font-size:13px;
+  line-height:1.5;
+  text-rendering:optimizeLegibility;
+}
+
+/* Paper grain — extremely subtle */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:radial-gradient(rgba(12,11,9,0.018) 1px,transparent 1px);
+  background-size:3px 3px;
+  pointer-events:none;
+  z-index:1;
+}
+
+/* ── LOADER ──────────────────────────────────── */
+#loader{
+  position:fixed;inset:0;
+  background:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  z-index:9999;
+  transition:opacity 0.7s ease, visibility 0.7s ease;
+}
+#loader.gone{opacity:0;visibility:hidden}
+.ldr{
+  width:560px;max-width:90vw;
+  color:var(--white);
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  letter-spacing:0.04em;
+}
+.ldr-row{
+  display:flex;justify-content:space-between;
+  padding:6px 0;
+  border-bottom:1px solid rgba(255,255,255,0.08);
+  opacity:0;transform:translateY(4px);
+  animation:ldrIn 0.4s ease forwards;
+}
+.ldr-row:nth-child(1){animation-delay:0.1s}
+.ldr-row:nth-child(2){animation-delay:0.25s}
+.ldr-row:nth-child(3){animation-delay:0.4s}
+.ldr-row:nth-child(4){animation-delay:0.55s}
+.ldr-row:nth-child(5){animation-delay:0.7s}
+.ldr-row:nth-child(6){animation-delay:0.85s}
+.ldr-k{color:rgba(255,255,255,0.45)}
+.ldr-v{color:var(--white)}
+.ldr-ok{color:#7CE69F}
+@keyframes ldrIn{to{opacity:1;transform:translateY(0)}}
+
+.ldr-mark{
+  font-family:'Fraunces',serif;
+  font-size:72px;font-weight:200;font-style:italic;
+  letter-spacing:-0.05em;
+  margin-bottom:32px;
+  opacity:0;
+  animation:ldrIn 0.6s ease 1.0s forwards;
+}
+.ldr-mark sup{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;font-style:normal;font-weight:400;
+  vertical-align:top;
+  color:rgba(255,255,255,0.4);
+  letter-spacing:0.2em;
+  margin-left:8px;
+  top:8px;position:relative;
+}
+
+/* ── NAV / STATUS BAR ────────────────────────── */
+.status{
+  position:sticky;top:0;z-index:100;
+  background:var(--ink);
+  color:rgba(255,255,255,0.7);
+  height:28px;
+  display:flex;align-items:center;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  letter-spacing:0.04em;
+  overflow:hidden;
+  border-bottom:1px solid #000;
+}
+.status-fixed{
+  display:flex;align-items:center;gap:14px;
+  padding:0 18px;
+  border-right:1px solid rgba(255,255,255,0.1);
+  height:100%;
+  flex-shrink:0;
+}
+.status-fixed .ld{
+  width:5px;height:5px;border-radius:50%;
+  background:#22C55E;
+  box-shadow:0 0 0 0 rgba(34,197,94,0.45);
+  animation:pulse 2.2s ease infinite;
+}
+@keyframes pulse{
+  0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.5)}
+  50%{box-shadow:0 0 0 5px rgba(34,197,94,0)}
+}
+.ticker-wrap{
+  flex:1;overflow:hidden;height:100%;
+  display:flex;align-items:center;
+  mask-image:linear-gradient(90deg,transparent 0,#000 5%,#000 95%,transparent 100%);
+}
+.ticker{
+  display:flex;gap:36px;
+  white-space:nowrap;
+  animation:tick 80s linear infinite;
+  padding-left:36px;
+}
+@keyframes tick{
+  from{transform:translateX(0)}
+  to{transform:translateX(-50%)}
+}
+.tk{display:inline-flex;gap:8px;align-items:center}
+.tk b{color:#fff;font-weight:500}
+.tk-up{color:#7CE69F}
+.tk-dn{color:#FF8276}
+
+nav.app{
+  position:sticky;top:28px;z-index:99;
+  background:rgba(244,241,232,0.92);
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  border-bottom:1px solid var(--rule);
+  height:62px;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 38px;
+}
+.brand{display:flex;align-items:center;gap:14px}
+.brand-mk{
+  width:36px;height:36px;
+  display:block;
+  color:var(--ink);
+  flex-shrink:0;
+}
+.brand-mk svg{display:block;width:100%;height:100%;overflow:visible}
+.bm-base{
+  fill:none;stroke:currentColor;
+  stroke-width:1.3;
+  stroke-dasharray:36;stroke-dashoffset:36;
+  animation:bmDraw 0.7s cubic-bezier(0.4,0,0.2,1) 2.3s forwards;
+}
+.bm-arm{
+  fill:none;stroke:currentColor;
+  stroke-width:1.7;stroke-linecap:round;
+  stroke-dasharray:36;stroke-dashoffset:36;
+  animation:bmDraw 0.55s cubic-bezier(0.4,0,0.2,1) 2.55s forwards;
+}
+.bm-node{
+  fill:currentColor;
+  transform:scale(0);
+  transform-origin:18px 28px;
+  transform-box:fill-box;
+  animation:bmPop 0.45s cubic-bezier(0.5,1.7,0.4,1) 3.0s forwards;
+}
+.bm-thr{
+  fill:none;stroke:var(--red);
+  stroke-width:1.4;stroke-linecap:round;
+  stroke-dasharray:1.4 1.6;
+  opacity:0;
+  animation:bmFade 0.5s ease 3.3s forwards;
+}
+@keyframes bmDraw{to{stroke-dashoffset:0}}
+@keyframes bmPop{to{transform:scale(1)}}
+@keyframes bmFade{to{opacity:1}}
+@keyframes spin{to{transform:rotate(360deg)}}
+.brand-txt{display:flex;flex-direction:column;line-height:1}
+.brand-name{
+  font-family:'Fraunces',serif;
+  font-size:22px;font-weight:300;font-style:italic;
+  letter-spacing:-0.04em;
+  color:var(--ink);
+}
+.brand-name b{font-weight:400;font-style:normal}
+.brand-sub{
+  font-family:'JetBrains Mono',monospace;
+  font-size:8.5px;
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--ink4);
+  margin-top:4px;
+}
+.nav-meta{
+  display:flex;align-items:center;gap:0;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  color:var(--ink3);
+}
+.nm{padding:0 18px;border-left:1px solid var(--rule);height:32px;display:flex;flex-direction:column;justify-content:center}
+.nm:first-child{border:none}
+.nm-l{font-size:8.5px;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink4);margin-bottom:2px}
+.nm-v{color:var(--ink);font-weight:500}
+
+/* ── LAYOUT ──────────────────────────────────── */
+.page{
+  display:grid;
+  grid-template-columns:300px 1fr;
+  min-height:calc(100vh - 90px);
+  position:relative;
+  z-index:2;
+}
+
+/* ── SIDEBAR ─────────────────────────────────── */
+.sidebar{
+  background:var(--paper);
+  border-right:1px solid var(--rule);
+  position:sticky;top:90px;
+  height:calc(100vh - 90px);
+  overflow-y:auto;
+  display:flex;flex-direction:column;
+}
+
+.sb-h{
+  padding:24px 24px 18px;
+  border-bottom:1px solid var(--rule2);
+}
+.sb-h-l{
+  font-family:'JetBrains Mono',monospace;
+  font-size:8.5px;font-weight:500;
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--ink4);margin-bottom:10px;
+  display:flex;justify-content:space-between;
+}
+.sb-h-l .ct{color:var(--ink3)}
+
+.deal-pick{
+  width:100%;
+  padding:13px 14px;
+  background:var(--white);
+  border:1px solid var(--rule);
+  border-radius:6px;
+  font-family:'Space Grotesk',sans-serif;
+  font-size:13px;color:var(--ink);
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236B6A60' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 14px center;
+  padding-right:32px;cursor:pointer;
+  transition:all 0.15s;
+}
+.deal-pick:hover{border-color:var(--ink2)}
+
+.sb-body{
+  padding:22px 24px;
+  flex:1;
+  display:flex;flex-direction:column;gap:16px;
+}
+.sb-grp{
+  font-family:'JetBrains Mono',monospace;
+  font-size:8.5px;font-weight:500;
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--ink4);
+  display:flex;justify-content:space-between;align-items:baseline;
+}
+.sb-grp .num{color:var(--ink5)}
+
+.field{display:flex;flex-direction:column;gap:6px}
+.fl{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;font-weight:500;
+  letter-spacing:0.16em;text-transform:uppercase;
+  color:var(--ink3);
+  display:flex;justify-content:space-between;
+}
+.fl .opt{color:var(--ink4);font-weight:400}
+input.fi,select.fi{
+  padding:10px 12px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:12px;color:var(--ink);
+  background:transparent;
+  border:none;
+  border-bottom:1px solid var(--rule);
+  border-radius:0;width:100%;
+  transition:all 0.15s;
+  appearance:none;
+}
+input.fi:focus,select.fi:focus{
+  outline:none;
+  border-bottom-color:var(--ink);
+}
+select.fi{
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236B6A60' stroke-width='1.4' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 4px center;
+  padding-right:24px;cursor:pointer;
+}
+.frow{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+
+.go{
+  width:calc(100% - 48px);
+  margin:0 24px 24px;
+  padding:14px;
+  background:var(--ink);color:var(--cream);
+  border:none;border-radius:0;
+  font-family:'Space Grotesk',sans-serif;
+  font-size:13px;font-weight:500;
+  letter-spacing:0.02em;cursor:pointer;
+  transition:all 0.2s;
+  display:flex;align-items:center;justify-content:space-between;
+  position:relative;overflow:hidden;
+}
+.go::before{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.06),transparent);
+  transform:translateX(-100%);
+  transition:transform 0.6s;
+}
+.go:hover::before{transform:translateX(100%)}
+.go:hover{background:#000}
+.go-l{display:flex;align-items:center;gap:10px}
+.go-num{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;color:rgba(255,255,255,0.4);
+  letter-spacing:0.18em;
+}
+
+/* ── MAIN ────────────────────────────────────── */
+.main{
+  background:var(--cream);
+  position:relative;
+}
+
+/* Vertical spine — the chapter rule */
+.main::before{
+  content:'';
+  position:absolute;
+  left:96px;top:0;bottom:0;
+  width:1px;
+  background:var(--rule2);
+}
+
+/* ── DOC HEADER ──────────────────────────────── */
+.doc-head{
+  background:var(--paper);
+  border-bottom:1px solid var(--rule);
+  position:relative;
+  overflow:hidden;
+}
+
+/* Subtle grid in doc head */
+.doc-head::after{
+  content:'';
+  position:absolute;
+  right:0;top:0;bottom:0;
+  width:55%;
+  background-image:
+    linear-gradient(var(--rule3) 1px,transparent 1px),
+    linear-gradient(90deg,var(--rule3) 1px,transparent 1px);
+  background-size:32px 32px;
+  mask-image:linear-gradient(90deg,transparent,#000);
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000);
+  pointer-events:none;
+}
+
+.dh-meta{
+  display:flex;
+  border-bottom:1px solid var(--rule2);
+  position:relative;z-index:1;
+  font-family:'JetBrains Mono',monospace;
+  font-size:9.5px;
+  letter-spacing:0.14em;text-transform:uppercase;
+  color:var(--ink3);
+}
+.dh-meta > div{
+  padding:11px 22px;
+  border-right:1px solid var(--rule2);
+}
+.dh-meta > div:first-child{padding-left:38px}
+.dh-meta b{color:var(--ink);font-weight:500;margin-left:8px}
+.dh-meta .cn{
+  background:var(--ink);color:var(--cream);
+  border-right-color:var(--ink);
+}
+.dh-meta .cn b{color:var(--cream)}
+.dh-meta .spc{flex:1;border-right:none}
+
+.dh-body{
+  position:relative;z-index:1;
+  padding:48px 38px 56px 96px;
+  display:grid;
+  grid-template-columns:1fr 360px;
+  gap:60px;
+  align-items:end;
+}
+
+.dh-chapter{
+  position:absolute;
+  left:38px;top:48px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:9.5px;font-weight:500;
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--ink4);
+  writing-mode:vertical-rl;
+  transform:rotate(180deg);
+}
+
+.dh-eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9.5px;font-weight:500;
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--ink4);margin-bottom:24px;
+  display:flex;align-items:center;gap:14px;
+}
+.dh-eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--red)}
+
+.dh-deal{
+  display:flex;align-items:baseline;gap:18px;
+  margin-bottom:36px;
+  font-family:'Fraunces',serif;
+  font-size:24px;font-weight:300;
+  color:var(--ink);
+  letter-spacing:-0.02em;
+}
+.dh-deal .arrow{
+  font-family:'Fraunces',serif;
+  font-style:italic;color:var(--ink4);
+  font-weight:200;
+}
+.dh-deal .meta{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;color:var(--ink4);
+  letter-spacing:0.04em;
+  margin-left:8px;
+}
+
+.dh-verdict{
+  font-family:'Fraunces',serif;
+  font-size:88px;font-weight:200;
+  color:var(--ink);letter-spacing:-0.045em;
+  line-height:0.92;margin-bottom:28px;
+}
+.dh-verdict em{
+  font-style:italic;
+  color:var(--red);
+  font-weight:300;
+  position:relative;
+}
+.dh-verdict em::after{
+  content:'';
+  position:absolute;left:0;right:0;bottom:6%;
+  height:2px;background:var(--red);
+  transform:scaleX(0);transform-origin:left;
+  animation:underln 0.9s cubic-bezier(0.7,0,0.3,1) 2.6s forwards;
+}
+@keyframes underln{to{transform:scaleX(1)}}
+
+.dh-deck{
+  max-width:560px;
+  font-family:'Fraunces',serif;
+  font-size:18px;font-weight:300;
+  color:var(--ink2);
+  line-height:1.5;
+  letter-spacing:-0.005em;
+  border-left:1px solid var(--ink);
+  padding-left:18px;
+}
+.dh-deck em{font-style:italic;color:var(--red)}
+
+/* Probability viz block */
+.prob-block{
+  background:var(--white);
+  border:1px solid var(--rule);
+  padding:24px;
+  position:relative;
+}
+.prob-block::before{
+  content:'PROBABILITY';
+  position:absolute;
+  top:-7px;left:18px;
+  background:var(--paper);
+  padding:0 8px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:8.5px;font-weight:500;
+  letter-spacing:0.22em;
+  color:var(--ink4);
+}
+.pb-top{
+  display:flex;align-items:baseline;justify-content:space-between;
+  margin-bottom:18px;
+}
+.pb-fig{
+  font-family:'Fraunces',serif;
+  font-size:84px;font-weight:200;font-style:italic;
+  color:var(--red);
+  letter-spacing:-0.06em;line-height:1;
+}
+.pb-pct{
+  font-family:'Fraunces',serif;
+  font-size:32px;font-weight:200;font-style:italic;
+  color:var(--red);
+  letter-spacing:-0.04em;
+  margin-left:2px;
+  align-self:flex-start;
+  margin-top:8px;
+}
+.pb-rt{
+  text-align:right;
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;color:var(--ink3);
+  line-height:1.7;
+  letter-spacing:0.04em;
+}
+.pb-rt b{color:var(--ink);font-weight:500}
+
+/* Distribution curve */
+.pb-curve{
+  position:relative;
+  height:90px;
+  margin-top:6px;
+}
+.pb-curve svg{display:block;width:100%;height:100%}
+.pb-axis{
+  display:flex;justify-content:space-between;
+  font-family:'JetBrains Mono',monospace;
+  font-size:8.5px;color:var(--ink4);
+  margin-top:6px;
+  letter-spacing:0.06em;
+}
+.pb-axis .here{color:var(--red);font-weight:500}
+
+.pb-foot{
+  display:flex;justify-content:space-between;align-items:center;
+  margin-top:18px;
+  padding-top:14px;
+  border-top:1px dashed var(--rule);
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;color:var(--ink3);
+  letter-spacing:0.04em;
+}
+.pb-foot .neg{color:var(--red);font-weight:500}
+
+/* ── SECTION ─────────────────────────────────── */
+.section{
+  position:relative;
+  padding:56px 38px 56px 96px;
+  border-bottom:1px solid var(--rule2);
+}
+.section:last-child{border:none}
+
+.sec-num{
+  position:absolute;
+  left:38px;top:56px;
+  width:48px;
+  display:flex;flex-direction:column;align-items:flex-start;
+  gap:6px;
+}
+.sec-num .n{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;font-weight:500;
+  color:var(--ink);
+  letter-spacing:0.02em;
+}
+.sec-num .l{
+  font-family:'JetBrains Mono',monospace;
+  font-size:8.5px;
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--ink4);
+  writing-mode:vertical-rl;
+  transform:rotate(180deg);
+  margin-top:4px;
+}
+
+.sec-h{
+  display:flex;align-items:baseline;justify-content:space-between;
+  margin-bottom:28px;
+  padding-bottom:14px;
+  border-bottom:1px solid var(--ink);
+}
+.sec-h-l{
+  font-family:'Fraunces',serif;
+  font-size:28px;font-weight:300;
+  font-style:italic;
+  color:var(--ink);
+  letter-spacing:-0.02em;
+}
+.sec-h-r{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9.5px;color:var(--ink3);
+  letter-spacing:0.06em;
+}
+
+/* ── METRICS — gauge style ───────────────────── */
+.metrics{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  gap:0;
+  border-top:1px solid var(--rule);
+  border-bottom:1px solid var(--rule);
+}
+.mc{
+  padding:22px 24px;
+  border-right:1px solid var(--rule2);
+  position:relative;
+}
+.mc:last-child{border-right:none}
+.mc-top{
+  display:flex;justify-content:space-between;align-items:baseline;
+  margin-bottom:6px;
+}
+.mc-l{
+  font-family:'JetBrains Mono',monospace;
+  font-size:8.5px;font-weight:500;
+  letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--ink4);
+}
+.mc-flag{
+  font-family:'JetBrains Mono',monospace;
+  font-size:8px;font-weight:500;
+  letter-spacing:0.14em;text-transform:uppercase;
+  padding:2px 6px;
+  border-radius:2px;
+}
+.mc-flag.r{background:var(--red-bg);color:var(--red)}
+.mc-flag.g{background:var(--green-bg);color:var(--green)}
+.mc-flag.a{background:var(--amber-bg);color:var(--amber)}
+
+.mc-v{
+  font-family:'Fraunces',serif;
+  font-size:40px;font-weight:200;
+  font-style:italic;
+  letter-spacing:-0.04em;color:var(--ink);
+  line-height:1;
+  margin:8px 0 14px;
+}
+.mc-v.red{color:var(--red)}
+.mc-v.green{color:var(--green)}
+.mc-v.amber{color:var(--amber)}
+
+/* Mini gauge */
+.mc-gauge{
+  height:24px;
+  position:relative;
+  margin-top:8px;
+}
+.mc-gauge svg{display:block;width:100%;height:100%;overflow:visible}
+.mc-s{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;color:var(--ink3);
+  margin-top:8px;
+  display:flex;justify-content:space-between;
+}
+.mc-s .pos{color:var(--ink2)}
+
+/* ── REASONING / TERMINAL ────────────────────── */
+.reasoning{
+  background:var(--ink);
+  color:var(--cream);
+  border-radius:0;
+  padding:0;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;
+  line-height:1.7;
+  overflow:hidden;
+  position:relative;
+}
+.rsn-bar{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 18px;
+  background:#1A1814;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  font-size:9px;
+  letter-spacing:0.16em;text-transform:uppercase;
+  color:rgba(255,255,255,0.4);
+}
+.rsn-bar-l{display:flex;gap:14px;align-items:center}
+.rsn-dot{width:7px;height:7px;border-radius:50%;background:#FF8276}
+.rsn-bar-r{display:flex;gap:18px}
+.rsn-bar-r b{color:#fff;font-weight:500;letter-spacing:0.04em}
+.rsn-body{
+  padding:18px 22px 22px;
+  display:flex;flex-direction:column;gap:3px;
+  max-height:none;
+}
+.rsn-line{
+  display:grid;
+  grid-template-columns:60px 90px 18px 1fr;
+  gap:14px;
+  align-items:baseline;
+}
+.rsn-ts{color:rgba(255,255,255,0.3);font-size:10px}
+.rsn-tag{
+  font-size:9px;font-weight:500;letter-spacing:0.1em;
+  padding:1px 6px;border-radius:2px;
+  display:inline-block;
+  width:fit-content;
+}
+.rsn-tag.input{background:rgba(124,230,159,0.12);color:#7CE69F}
+.rsn-tag.check{background:rgba(255,219,102,0.12);color:#FFDB66}
+.rsn-tag.kill{background:rgba(255,130,118,0.14);color:#FF8276}
+.rsn-tag.calc{background:rgba(180,180,255,0.12);color:#B4B4FF}
+.rsn-tag.out{background:rgba(255,255,255,0.08);color:#fff}
+.rsn-arrow{color:rgba(255,255,255,0.25)}
+.rsn-msg{color:rgba(255,255,255,0.85);font-weight:300}
+.rsn-msg b{color:#fff;font-weight:500}
+.rsn-msg .red{color:#FF8276;font-weight:500}
+.rsn-msg .grn{color:#7CE69F;font-weight:500}
+.rsn-msg .amb{color:#FFDB66;font-weight:500}
+.rsn-cursor{
+  display:inline-block;width:7px;height:13px;
+  background:var(--cream);
+  vertical-align:middle;margin-left:4px;
+  animation:blink 1s steps(2) infinite;
+}
+@keyframes blink{50%{opacity:0}}
+
+/* ── DRIVERS / WEIGHTS ───────────────────────── */
+.drivers{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:0;
+  border:1px solid var(--rule);
+  background:var(--white);
+}
+.drv{padding:26px 28px;border-right:1px solid var(--rule2)}
+.drv:last-child{border-right:none}
+.drv-t{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;font-weight:500;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--ink4);
+  margin-bottom:6px;
+}
+.drv-st{
+  font-family:'Fraunces',serif;
+  font-size:18px;font-weight:300;font-style:italic;
+  color:var(--ink);
+  letter-spacing:-0.01em;margin-bottom:22px;
+}
+
+/* Weighted blocks */
+.weights{display:flex;flex-direction:column;gap:14px}
+.wt{display:grid;grid-template-columns:1fr 60px;gap:18px;align-items:center}
+.wt-l{
+  display:flex;flex-direction:column;gap:4px;
+}
+.wt-n{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;color:var(--ink);font-weight:500;
+}
+.wt-b{
+  height:6px;
+  background:var(--rule3);
+  position:relative;overflow:hidden;
+}
+.wt-f{
+  position:absolute;left:0;top:0;bottom:0;
+  background:var(--ink);
+  width:0;
+  transition:width 1.4s cubic-bezier(0.5,0,0.2,1);
+}
+.wt-f.first{background:var(--red)}
+.wt-p{
+  font-family:'Fraunces',serif;
+  font-size:22px;font-weight:300;font-style:italic;
+  color:var(--ink);
+  letter-spacing:-0.03em;
+  text-align:right;line-height:1;
+}
+
+/* Kill criteria — alerts */
+.kill-list{display:flex;flex-direction:column;gap:0}
+.ka{
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  gap:18px;align-items:start;
+  padding:16px 0;
+  border-bottom:1px solid var(--rule2);
+}
+.ka:last-child{border:none;padding-bottom:0}
+.ka:first-child{padding-top:0}
+.ka-sev{
+  display:flex;flex-direction:column;align-items:center;
+  width:48px;flex-shrink:0;
+}
+.ka-sev .glyph{
+  width:22px;height:22px;
+  border:1.5px solid var(--red);
+  color:var(--red);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;font-weight:700;
+  border-radius:50%;
+  margin-bottom:6px;
+}
+.ka-sev.a .glyph{border-color:var(--amber);color:var(--amber)}
+.ka-sev .code{
+  font-family:'JetBrains Mono',monospace;
+  font-size:8px;color:var(--ink4);
+  letter-spacing:0.1em;
+}
+.ka-body .title{
+  font-family:'Space Grotesk',sans-serif;
+  font-size:14px;font-weight:500;
+  color:var(--ink);letter-spacing:-0.01em;
+  margin-bottom:4px;
+  display:flex;align-items:center;gap:10px;
+}
+.ka-body .ts{
+  font-family:'JetBrains Mono',monospace;
+  font-size:8.5px;font-weight:400;
+  letter-spacing:0.12em;color:var(--ink4);
+}
+.ka-body .desc{
+  font-size:12.5px;color:var(--ink2);
+  line-height:1.55;
+  max-width:42ch;
+}
+.ka-num{
+  font-family:'Fraunces',serif;
+  font-size:30px;font-weight:200;font-style:italic;
+  color:var(--red);
+  letter-spacing:-0.04em;line-height:1;
+  align-self:center;
+}
+.ka.a .ka-num{color:var(--amber)}
+
+/* ── MARKET ──────────────────────────────────── */
+.market{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:0;
+  border:1px solid var(--rule);
+  background:var(--white);
+}
+.mk{padding:22px 24px;border-right:1px solid var(--rule2);position:relative}
+.mk:last-child{border-right:none}
+.mk-l{
+  font-family:'JetBrains Mono',monospace;
+  font-size:8.5px;font-weight:500;
+  letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--ink4);margin-bottom:8px;
+}
+.mk-v{
+  font-family:'Fraunces',serif;
+  font-size:30px;font-weight:300;font-style:italic;
+  color:var(--ink);
+  letter-spacing:-0.03em;line-height:1;
+}
+.mk-spark{
+  margin-top:14px;
+  height:34px;
+}
+.mk-spark svg{display:block;width:100%;height:100%}
+.mk-d{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;color:var(--ink3);
+  margin-top:8px;
+  display:flex;justify-content:space-between;
+}
+.mk-d .up{color:var(--green)}
+.mk-d .dn{color:var(--red)}
+
+/* ── SCENARIOS — fan chart ───────────────────── */
+.scenarios{
+  display:grid;
+  grid-template-columns:1.2fr 1fr;
+  gap:0;
+  border:1px solid var(--rule);
+  background:var(--white);
+}
+.fan{
+  padding:30px;
+  border-right:1px solid var(--rule2);
+  position:relative;
+}
+.fan-t{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;font-weight:500;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--ink4);margin-bottom:8px;
+}
+.fan-st{
+  font-family:'Fraunces',serif;
+  font-size:18px;font-weight:300;font-style:italic;
+  color:var(--ink);margin-bottom:18px;
+}
+.fan-svg{
+  position:relative;
+  height:240px;
+  margin-top:12px;
+}
+.fan-svg svg{display:block;width:100%;height:100%;overflow:visible}
+
+.fan-legend{
+  display:flex;gap:18px;
+  margin-top:18px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;
+  color:var(--ink3);
+}
+.fan-legend .lg{display:flex;align-items:center;gap:8px}
+.lg-swatch{width:14px;height:8px;border-radius:1px}
+
+.sc-cards{
+  display:flex;flex-direction:column;
+}
+.sc-card{
+  padding:22px 28px;
+  border-bottom:1px solid var(--rule2);
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:14px;align-items:center;
+}
+.sc-card:last-child{border-bottom:none}
+.sc-card-l{display:flex;align-items:baseline;gap:14px}
+.sc-card-tag{
+  font-family:'JetBrains Mono',monospace;
+  font-size:8.5px;font-weight:500;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--ink4);
+}
+.sc-card-n{
+  font-family:'Fraunces',serif;
+  font-size:20px;font-weight:300;font-style:italic;
+  color:var(--ink);
+  letter-spacing:-0.02em;
+}
+.sc-card-grid{
+  display:grid;
+  grid-template-columns:repeat(4,auto);
+  gap:0;
+  margin-top:10px;
+}
+.sc-stat{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  color:var(--ink3);
+  padding-right:18px;border-right:1px solid var(--rule2);
+  margin-right:18px;
+}
+.sc-stat:last-child{border-right:none;margin-right:0;padding-right:0}
+.sc-stat b{color:var(--ink);display:block;font-weight:500;font-size:11.5px;margin-top:2px;letter-spacing:-0.01em}
+.sc-irr{
+  font-family:'Fraunces',serif;
+  font-size:38px;font-weight:200;font-style:italic;
+  color:var(--green);
+  letter-spacing:-0.04em;line-height:1;
+}
+.sc-irr.amber{color:var(--amber)}
+.sc-irr.red{color:var(--red)}
+.sc-irr .sml{font-size:18px}
+
+/* ── COMPS — scatter + table ─────────────────── */
+.comps{
+  display:grid;
+  grid-template-columns:380px 1fr;
+  gap:0;
+  border:1px solid var(--rule);
+  background:var(--white);
+}
+.scatter{
+  padding:24px;
+  border-right:1px solid var(--rule2);
+  display:flex;flex-direction:column;
+}
+.scatter-h{
+  display:flex;justify-content:space-between;align-items:baseline;
+  margin-bottom:14px;
+}
+.scatter-t{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;font-weight:500;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--ink4);
+}
+.scatter-svg{
+  flex:1;min-height:280px;
+  position:relative;
+}
+.scatter-svg svg{display:block;width:100%;height:100%;overflow:visible}
+.scatter-legend{
+  display:flex;justify-content:space-between;
+  margin-top:10px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;
+  color:var(--ink3);
+}
+
+.comp-table{
+  overflow:hidden;
+}
+.ct-h{
+  padding:16px 22px;
+  border-bottom:1px solid var(--rule);
+  display:flex;justify-content:space-between;align-items:baseline;
+}
+.ct-h-t{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;font-weight:500;
+  letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--ink4);
+}
+.ct-h-n{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;color:var(--ink3);
+}
+.comp-table table{width:100%;border-collapse:collapse}
+.comp-table th{
+  padding:9px 16px;text-align:left;
+  font-family:'JetBrains Mono',monospace;
+  font-size:8px;font-weight:500;
+  letter-spacing:0.18em;text-transform:uppercase;
+  color:var(--ink4);
+  border-bottom:1px solid var(--rule2);
+}
+.comp-table td{
+  padding:13px 16px;
+  font-size:12.5px;color:var(--ink2);
+  border-bottom:1px solid var(--rule2);
+}
+.comp-table tbody tr:last-child td{border:none}
+.comp-table tbody tr:hover td{background:var(--paper)}
+.comp-table td.p{color:var(--ink);font-weight:500;letter-spacing:-0.01em}
+.comp-table td.m{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11px;font-weight:400;color:var(--ink2);
+}
+.comp-table th.r,.comp-table td.r{text-align:right}
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:2px 8px;border-radius:2px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:8.5px;font-weight:500;
+  letter-spacing:0.12em;text-transform:uppercase;
+}
+.badge::before{content:'';width:5px;height:5px;border-radius:50%}
+.badge.c{background:var(--green-bg);color:var(--green)}
+.badge.c::before{background:var(--green)}
+.badge.t{background:var(--red-bg);color:var(--red)}
+.badge.t::before{background:var(--red)}
+
+/* ── AUTOPSY / TIMELINE ──────────────────────── */
+.autopsy{
+  background:var(--white);
+  border:1px solid var(--rule);
+  padding:32px 38px;
+  position:relative;
+}
+.autopsy-h{
+  display:flex;justify-content:space-between;align-items:baseline;
+  margin-bottom:6px;
+}
+.autopsy-t{
+  font-family:'Fraunces',serif;
+  font-size:22px;font-weight:300;font-style:italic;
+  color:var(--ink);
+  letter-spacing:-0.02em;
+}
+.autopsy-sub{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9.5px;color:var(--ink3);
+  letter-spacing:0.06em;
+}
+.autopsy-dek{
+  font-family:'Fraunces',serif;
+  font-size:14px;font-weight:300;
+  color:var(--ink2);
+  max-width:64ch;
+  margin-bottom:28px;
+  line-height:1.55;
+}
+.autopsy-dek em{font-style:italic;color:var(--red)}
+
+.timeline{
+  position:relative;
+  padding-top:22px;
+}
+.timeline::before{
+  content:'';position:absolute;
+  left:0;right:0;top:32px;
+  height:1px;background:var(--rule);
+}
+.tl-row{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:24px;
+  position:relative;
+}
+.tl-step{
+  position:relative;padding-top:20px;
+}
+.tl-step::before{
+  content:'';position:absolute;
+  top:5px;left:0;
+  width:9px;height:9px;
+  border-radius:50%;
+  background:var(--white);
+  border:1.5px solid var(--ink);
+}
+.tl-step.red::before{background:var(--red);border-color:var(--red)}
+.tl-date{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;color:var(--ink4);
+  letter-spacing:0.14em;text-transform:uppercase;
+  margin-bottom:8px;
+}
+.tl-event{
+  font-family:'Fraunces',serif;
+  font-size:15px;font-weight:300;
+  color:var(--ink);letter-spacing:-0.01em;
+  line-height:1.3;margin-bottom:6px;
+}
+.tl-note{
+  font-size:11px;color:var(--ink3);line-height:1.5;
+}
+
+/* ── MEMO CTA ────────────────────────────────── */
+.memo-cta{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:32px;
+  padding:36px 40px;
+  background:var(--ink);
+  color:var(--cream);
+  border:none;
+  width:100%;text-align:left;
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  transition:all 0.25s;
+}
+.memo-cta::before{
+  content:'';
+  position:absolute;left:0;top:0;bottom:0;
+  width:3px;background:var(--red);
+}
+.memo-cta::after{
+  content:'';
+  position:absolute;inset:0;
+  background:radial-gradient(circle at 90% 50%,rgba(139,26,14,0.25),transparent 50%);
+  opacity:0;transition:opacity 0.3s;
+}
+.memo-cta:hover::after{opacity:1}
+.memo-l{display:flex;flex-direction:column;gap:8px}
+.memo-eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;font-weight:500;
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:rgba(255,255,255,0.45);
+  display:flex;align-items:center;gap:12px;
+}
+.memo-eyebrow .dot{width:6px;height:6px;border-radius:50%;background:var(--red2);animation:pulse2 1.8s ease infinite}
+@keyframes pulse2{50%{opacity:0.4}}
+.memo-title{
+  font-family:'Fraunces',serif;
+  font-size:36px;font-weight:200;font-style:italic;
+  color:var(--cream);
+  letter-spacing:-0.035em;
+  line-height:1.05;
+}
+.memo-title b{font-style:normal;font-weight:300}
+.memo-sub{
+  font-size:13px;color:rgba(255,255,255,0.55);
+  max-width:54ch;line-height:1.5;
+  margin-top:4px;
+}
+.memo-r{
+  display:flex;align-items:center;gap:18px;
+  align-self:end;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  letter-spacing:0.14em;text-transform:uppercase;
+  color:rgba(255,255,255,0.5);
+}
+.memo-r .arrow{
+  width:48px;height:48px;border-radius:50%;
+  background:var(--cream);color:var(--ink);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Fraunces',serif;font-size:24px;font-weight:200;
+  transition:all 0.2s;
+}
+.memo-cta:hover .memo-r .arrow{
+  background:var(--red);color:var(--cream);
+  transform:translateX(4px);
+}
+
+/* ── FOOTER ──────────────────────────────────── */
+.foot{
+  padding:32px 38px;
+  border-top:1px solid var(--rule2);
+  display:flex;justify-content:space-between;
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;color:var(--ink4);
+  letter-spacing:0.1em;text-transform:uppercase;
+}
+.foot a{color:var(--ink3);text-decoration:none}
+
+/* ── ABOUT / COLOPHON ─────────────────────── */
+.about{
+  background:var(--white);
+  border:1px solid var(--rule);
+  display:grid;
+  grid-template-columns:1.5fr 1fr;
+  gap:0;
+}
+.about-l{
+  padding:36px 40px 32px;
+  border-right:1px solid var(--rule2);
+  display:flex;flex-direction:column;
+}
+.about-eyebrow{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;font-weight:500;
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--ink4);
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:18px;
+}
+.about-eyebrow::before{
+  content:'';width:5px;height:5px;border-radius:50%;background:var(--red);
+}
+.about-h{
+  font-family:'Fraunces',serif;
+  font-size:38px;font-weight:200;
+  color:var(--ink);letter-spacing:-0.035em;
+  line-height:1.05;margin-bottom:22px;
+}
+.about-h em{font-style:italic;color:var(--red);font-weight:300}
+.about-body{
+  font-family:'Fraunces',serif;
+  font-size:15.5px;font-weight:300;
+  color:var(--ink2);
+  line-height:1.65;
+  letter-spacing:-0.005em;
+  max-width:58ch;
+}
+.about-body p{margin-bottom:14px}
+.about-body p:last-child{margin-bottom:0}
+.about-body em{font-style:italic;color:var(--red);font-weight:400}
+.about-body b{font-weight:500;color:var(--ink);font-style:normal}
+
+.about-r{
+  padding:36px 32px 32px;
+  background:var(--paper);
+  display:flex;flex-direction:column;
+}
+.about-r-t{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;font-weight:500;
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--ink4);margin-bottom:6px;
+}
+.about-r-st{
+  font-family:'Fraunces',serif;
+  font-size:18px;font-weight:300;font-style:italic;
+  color:var(--ink);
+  letter-spacing:-0.01em;margin-bottom:22px;
+  padding-bottom:18px;
+  border-bottom:1px solid var(--rule);
+}
+.spec{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:14px;align-items:baseline;
+  padding:11px 0;
+  border-bottom:1px solid var(--rule2);
+}
+.spec:last-child{border:none}
+.spec-k{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;color:var(--ink3);
+  letter-spacing:0.04em;
+}
+.spec-v{
+  font-family:'JetBrains Mono',monospace;
+  font-size:11.5px;color:var(--ink);
+  font-weight:500;
+  letter-spacing:-0.01em;
+  text-align:right;
+}
+.spec-v.big{
+  font-family:'Fraunces',serif;
+  font-size:22px;font-weight:300;font-style:italic;
+  color:var(--ink);
+  letter-spacing:-0.03em;line-height:1;
+}
+.spec-v.big.g{color:var(--green)}
+
+.about-foot{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:32px;align-items:center;
+  margin-top:24px;
+  padding:22px 40px;
+  background:var(--ink);
+  color:var(--cream);
+  border:1px solid var(--ink);
+}
+.about-foot-l{display:flex;flex-direction:column;gap:6px}
+.about-byline{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;font-weight:500;
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:rgba(255,255,255,0.45);
+}
+.about-name{
+  font-family:'Fraunces',serif;
+  font-size:22px;font-weight:200;font-style:italic;
+  letter-spacing:-0.025em;
+}
+.about-name b{font-weight:300;font-style:normal}
+.about-affil{
+  font-size:12px;color:rgba(255,255,255,0.6);
+  margin-top:2px;
+}
+.about-cta{
+  display:inline-flex;align-items:center;gap:14px;
+  padding:11px 18px;
+  background:transparent;
+  color:var(--cream);
+  border:1px solid rgba(255,255,255,0.3);
+  font-family:'JetBrains Mono',monospace;
+  font-size:10.5px;font-weight:500;
+  letter-spacing:0.14em;text-transform:uppercase;
+  cursor:pointer;
+  transition:all 0.2s;
+  text-decoration:none;
+}
+.about-cta:hover{
+  background:var(--red);
+  border-color:var(--red);
+  color:var(--cream);
+}
+.about-cta .arr{
+  font-family:'Fraunces',serif;
+  font-size:18px;font-weight:200;
+  font-style:italic;
+  transition:transform 0.2s;
+}
+.about-cta:hover .arr{transform:translateX(3px)}
+
+/* ── ABOUT THE MARK ─────────────────────── */
+.mark-note{
+  margin-top:0;
+  border:1px solid var(--rule);
+  border-top:none;
+  background:var(--paper);
+  display:grid;
+  grid-template-columns:1.1fr 1fr;
+  gap:0;
+}
+.mark-stage{
+  padding:36px 32px;
+  border-right:1px solid var(--rule2);
+  position:relative;
+  background:
+    linear-gradient(var(--rule3) 1px,transparent 1px),
+    linear-gradient(90deg,var(--rule3) 1px,transparent 1px),
+    var(--paper);
+  background-size:24px 24px;
+}
+.mark-stage svg{display:block;width:100%;height:auto;max-height:280px;overflow:visible}
+.mark-stage .mk-ax{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9.5px;
+  fill:var(--ink3);
+  letter-spacing:0.04em;
+}
+.mark-stage .mk-ax-em{fill:var(--red);font-weight:500}
+.mark-stage .mk-lead{stroke:var(--ink4);stroke-width:0.7;stroke-dasharray:2 2}
+.mark-stage .mk-lead-em{stroke:var(--red);stroke-width:0.9;stroke-dasharray:2 2}
+.mark-stage .mk-big-base{stroke:var(--ink);stroke-width:1.4;fill:none}
+.mark-stage .mk-big-arm{stroke:var(--ink);stroke-width:1.8;stroke-linecap:round;fill:none}
+.mark-stage .mk-big-node{fill:var(--ink)}
+.mark-stage .mk-big-thr{stroke:var(--red);stroke-width:1.6;stroke-linecap:round;stroke-dasharray:1.6 2;fill:none}
+
+.mark-text{
+  padding:36px 40px;
+  display:flex;flex-direction:column;
+  justify-content:center;
+}
+.mark-text .mt-l{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;font-weight:500;
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--ink4);
+  display:flex;align-items:center;gap:14px;
+  margin-bottom:14px;
+}
+.mark-text .mt-l::before{
+  content:'';width:5px;height:5px;border-radius:50%;background:var(--red);
+}
+.mark-text .mt-h{
+  font-family:'Fraunces',serif;
+  font-size:26px;font-weight:200;
+  color:var(--ink);
+  letter-spacing:-0.03em;
+  line-height:1.1;margin-bottom:18px;
+}
+.mark-text .mt-h em{font-style:italic;color:var(--red);font-weight:300}
+.mark-text .mt-p{
+  font-family:'Fraunces',serif;
+  font-size:14px;font-weight:300;
+  color:var(--ink2);
+  line-height:1.6;
+  max-width:48ch;
+  margin-bottom:18px;
+}
+.mark-text .mt-p em{font-style:italic;color:var(--red);font-weight:400}
+.mark-text .mt-p b{font-weight:500;color:var(--ink);font-style:normal}
+
+.mt-legend{
+  display:flex;flex-direction:column;gap:10px;
+  padding-top:18px;
+  border-top:1px solid var(--rule);
+}
+.mt-leg{
+  display:grid;
+  grid-template-columns:18px 1fr;
+  gap:14px;align-items:center;
+}
+.mt-leg-g{display:flex;justify-content:center}
+.mt-leg-t{
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;color:var(--ink2);
+  letter-spacing:0.02em;
+}
+.mt-leg-t b{color:var(--ink);font-weight:500}
+
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-thumb{background:var(--rule);border-radius:2px}
+::-webkit-scrollbar-track{background:transparent}
+
+/* ── PIPELINE STRIP — "what this tool does" ── */
+.pipeline{
+  background:var(--paper);
+  border-bottom:1px solid var(--rule);
+  padding:18px 38px;
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:36px;align-items:center;
+}
+.pl-intro{
+  display:flex;flex-direction:column;gap:4px;
+}
+.pl-intro-l{
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;font-weight:500;
+  letter-spacing:0.22em;text-transform:uppercase;
+  color:var(--ink4);
+}
+.pl-intro-t{
+  font-family:'Fraunces',serif;
+  font-size:16px;font-weight:300;
+  color:var(--ink2);
+  letter-spacing:-0.01em;
+  max-width:64ch;
+}
+.pl-intro-t em{font-style:italic;color:var(--red)}
+
+.pl-steps{
+  display:flex;align-items:center;gap:0;
+  font-family:'JetBrains Mono',monospace;
+  font-size:10px;
+  letter-spacing:0.14em;text-transform:uppercase;
+}
+.pl-step{
+  display:flex;align-items:center;gap:10px;
+  color:var(--ink4);
+  padding:6px 16px;
+  border:1px solid transparent;
+  border-radius:2px;
+  transition:all 0.3s;
+}
+.pl-step .pl-dot{
+  width:7px;height:7px;border-radius:50%;
+  background:var(--ink5);
+  flex-shrink:0;
+  transition:all 0.3s;
+}
+.pl-step.done{color:var(--ink3)}
+.pl-step.done .pl-dot{background:var(--green)}
+.pl-step.active{
+  color:var(--ink);font-weight:500;
+  border-color:var(--ink);
+  background:var(--white);
+}
+.pl-step.active .pl-dot{
+  background:var(--red);
+  box-shadow:0 0 0 0 rgba(139,26,14,0.5);
+  animation:plPulse 1.8s ease infinite;
+}
+@keyframes plPulse{
+  50%{box-shadow:0 0 0 6px rgba(139,26,14,0)}
+}
+.pl-arrow{
+  color:var(--ink5);
+  margin:0 4px;
+  font-family:'Fraunces',serif;
+  font-style:italic;font-weight:200;font-size:14px;
+}
+
+/* ── ANIMATIONS — reveal, counters, draw-in ── */
+
+/* Word-by-word verdict reveal */
+.dh-verdict .wrd{
+  display:inline-block;
+  opacity:0;
+  transform:translateY(0.25em);
+  filter:blur(4px);
+  animation:wrdIn 0.7s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+.dh-verdict .wrd.w1{animation-delay:2.05s}
+.dh-verdict .wrd.w2{animation-delay:2.25s}
+@keyframes wrdIn{
+  to{opacity:1;transform:translateY(0);filter:blur(0)}
+}
+
+/* Deck + meta fade-in */
+.dh-eyebrow,.dh-deal,.dh-deck{
+  opacity:0;
+  transform:translateY(8px);
+  animation:fadeUp 0.7s cubic-bezier(0.4,0,0.2,1) forwards;
+}
+.dh-eyebrow{animation-delay:1.7s}
+.dh-deal{animation-delay:1.85s}
+.dh-deck{animation-delay:2.6s}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+
+/* Probability block — drop in then come alive */
+.prob-block{
+  opacity:0;
+  transform:translateY(12px);
+  animation:fadeUp 0.8s cubic-bezier(0.4,0,0.2,1) 2.0s forwards;
+  position:relative;
+  overflow:hidden;
+}
+/* Scan sweep */
+.prob-block::after{
+  content:'';
+  position:absolute;left:-30%;top:0;bottom:0;
+  width:30%;
+  background:linear-gradient(90deg,transparent,rgba(139,26,14,0.05),transparent);
+  animation:scan 6s cubic-bezier(0.6,0,0.4,1) 3.5s infinite;
+  pointer-events:none;
+}
+@keyframes scan{
+  0%{left:-30%}
+  60%{left:100%}
+  100%{left:100%}
+}
+
+/* SVG path draw-in */
+.curve-bg,.curve-line,.curve-fill{
+  stroke-dasharray:1000;
+  stroke-dashoffset:1000;
+  animation:drawPath 1.8s cubic-bezier(0.4,0,0.2,1) 2.4s forwards;
+}
+.curve-fill{
+  animation:drawFill 1.4s ease 3.0s forwards;
+  opacity:0;
+}
+@keyframes drawPath{to{stroke-dashoffset:0}}
+@keyframes drawFill{to{opacity:1}}
+
+.curve-marker,.curve-marker-ring,.curve-marker-line,.curve-marker-label{
+  opacity:0;
+  animation:markerIn 0.5s ease 3.4s forwards;
+}
+.curve-marker-ring{
+  transform-origin:center;
+  animation:markerIn 0.5s ease 3.4s forwards, markerPulse 2.2s ease 3.9s infinite;
+}
+@keyframes markerIn{to{opacity:1}}
+@keyframes markerPulse{
+  0%,100%{r:9;opacity:0.3}
+  50%{r:13;opacity:0}
+}
+
+.threshold-line,.threshold-text{
+  opacity:0;
+  animation:fadeOnly 0.5s ease 3.1s forwards;
+}
+@keyframes fadeOnly{to{opacity:0.5}}
+.threshold-text{
+  animation:fadeOnly2 0.5s ease 3.1s forwards;
+}
+@keyframes fadeOnly2{to{opacity:1}}
+
+/* Hero deal-row + chapter label */
+.dh-chapter{
+  opacity:0;
+  animation:fadeUp 0.6s ease 1.5s forwards;
+}
+
+/* Sparkline draw-in on view */
+.spark-line{
+  stroke-dasharray:600;
+  stroke-dashoffset:600;
+  transition:stroke-dashoffset 1.4s cubic-bezier(0.4,0,0.2,1);
+}
+.spark-line.in{stroke-dashoffset:0}
+.spark-end{
+  opacity:0;transition:opacity 0.4s ease 1.2s;
+}
+.spark-end.in{opacity:1}
+
+/* Metric card hover */
+.mc{
+  transition:background 0.2s;
+  cursor:default;
+}
+.mc::before{
+  content:'';
+  position:absolute;left:0;right:0;top:0;
+  height:2px;
+  background:var(--ink);
+  transform:scaleX(0);
+  transform-origin:left;
+  transition:transform 0.35s cubic-bezier(0.4,0,0.2,1);
+}
+.mc:hover::before{transform:scaleX(1)}
+.mc:hover{background:var(--paper)}
+.mc.r-mc::before{background:var(--red)}
+.mc.a-mc::before{background:var(--amber)}
+.mc.g-mc::before{background:var(--green)}
+
+/* Scatter dot intro */
+.dot-in{
+  opacity:0;
+  transform:scale(0.4);
+  transform-origin:center;
+  transform-box:fill-box;
+  transition:opacity 0.45s ease, transform 0.45s cubic-bezier(0.5,1.6,0.4,1);
+}
+.dot-in.in{opacity:1;transform:scale(1)}
+
+/* Fan chart paths draw in */
+.fan-path{
+  stroke-dasharray:1200;
+  stroke-dashoffset:1200;
+  transition:stroke-dashoffset 1.6s cubic-bezier(0.4,0,0.2,1);
+}
+.fan-path.in{stroke-dashoffset:0}
+.fan-fill{
+  opacity:0;
+  transition:opacity 0.8s ease 0.6s;
+}
+.fan-fill.in{opacity:0.12}
+.fan-fill.dn.in{opacity:0.10}
+
+/* Sparkline endpoints — gentle pulse */
+.spark-end{
+  animation:endPulse 2.2s ease infinite;
+}
+@keyframes endPulse{
+  0%,100%{filter:drop-shadow(0 0 0 transparent)}
+  50%{filter:drop-shadow(0 0 4px rgba(12,11,9,0.4))}
+}
+
+/* Reasoning trace — line stagger when in view */
+.rsn-line{
+  opacity:0;
+  transform:translateX(-4px);
+  transition:opacity 0.4s ease, transform 0.4s ease;
+}
+.rsn-line.in{opacity:1;transform:translateX(0)}
+
+/* Timeline step reveal */
+.tl-step{
+  opacity:0;
+  transform:translateY(8px);
+  transition:opacity 0.5s ease, transform 0.5s cubic-bezier(0.4,0,0.2,1);
+}
+.tl-step.in{opacity:1;transform:translateY(0)}
+
+/* SC card hover */
+.sc-card{
+  transition:background 0.2s;
+}
+.sc-card:hover{background:var(--paper)}
+
+/* Kill row hover */
+.ka{
+  transition:background 0.2s;
+  padding-left:8px;padding-right:8px;
+  margin-left:-8px;margin-right:-8px;
+}
+.ka:hover{background:var(--paper)}
+
+/* Subtle live "tick" near probability — micro animation */
+.prob-live{
+  display:inline-flex;align-items:center;gap:6px;
+  font-family:'JetBrains Mono',monospace;
+  font-size:9px;
+  color:var(--ink4);
+  letter-spacing:0.14em;text-transform:uppercase;
+  margin-bottom:14px;
+}
+.prob-live::before{
+  content:'';width:5px;height:5px;border-radius:50%;
+  background:var(--red);
+  animation:pulse2 1.6s ease infinite;
+}
+
+/* Sticky deal pick — subtle focus */
+.deal-pick:focus{outline:none;border-color:var(--ink)}
+
+/* ── PAGE NAV in status bar ── */
+.status-nav{
+  display:flex;align-items:center;height:100%;flex-shrink:0;
+  border-left:1px solid rgba(255,255,255,0.1);
+}
+.status-nav a{
+  color:rgba(255,255,255,0.55);text-decoration:none;
+  padding:0 15px;height:100%;display:flex;align-items:center;
+  letter-spacing:0.16em;text-transform:uppercase;font-size:9px;
+  border-left:1px solid rgba(255,255,255,0.07);transition:all 0.15s;
+}
+.status-nav a:first-child{border-left:none}
+.status-nav a:hover{color:#fff;background:rgba(255,255,255,0.05)}
+.status-nav a.active{color:#fff}
+.status-nav a.active::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--red2);margin-right:7px}
+
+/* ── INFO TOOLTIP (JS-positioned) ── */
+.tip{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:13px;height:13px;border:1px solid var(--ink4);border-radius:50%;
+  color:var(--ink3);font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:700;
+  cursor:help;margin-left:6px;vertical-align:middle;flex-shrink:0;
+  transition:all 0.15s;user-select:none;line-height:1;
+}
+.tip:hover,.tip:focus{background:var(--ink);color:var(--cream);border-color:var(--ink);outline:none}
+.tip.dk{border-color:rgba(255,255,255,0.4);color:rgba(255,255,255,0.6)}
+.tip.dk:hover,.tip.dk:focus{background:var(--cream);color:var(--ink);border-color:var(--cream)}
+#tooltip{
+  position:fixed;z-index:999;max-width:260px;
+  background:var(--ink);color:var(--cream);
+  padding:12px 14px;border-radius:4px;
+  font-family:'Space Grotesk',sans-serif;font-size:11.5px;line-height:1.55;
+  letter-spacing:0;font-weight:400;
+  box-shadow:0 10px 30px rgba(0,0,0,0.22);
+  opacity:0;visibility:hidden;transform:translateY(4px);
+  transition:opacity 0.16s ease,transform 0.16s ease;
+  pointer-events:none;
+}
+#tooltip.on{opacity:1;visibility:visible;transform:translateY(0)}
+#tooltip b{color:#fff;font-weight:600}
+#tooltip::after{content:'';position:absolute;width:9px;height:9px;background:var(--ink);transform:rotate(45deg)}
+#tooltip.below::after{top:-4px;left:var(--ax,50%);margin-left:-4px}
+#tooltip.above::after{bottom:-4px;left:var(--ax,50%);margin-left:-4px}
+
+/* ── DEAL MODE TOGGLE ── */
+.mode{
+  display:grid;grid-template-columns:1fr 1fr 1fr;
+  border:1px solid var(--rule);background:var(--white);margin-top:12px;
+}
+.mode-b{
+  padding:10px 4px;text-align:center;
+  font-family:'JetBrains Mono',monospace;font-size:8.5px;font-weight:500;
+  letter-spacing:0.06em;text-transform:uppercase;color:var(--ink3);
+  cursor:pointer;border-right:1px solid var(--rule2);transition:all 0.15s;
+  background:none;line-height:1.3;
+}
+.mode-b:last-child{border-right:none}
+.mode-b.active{background:var(--ink);color:var(--cream)}
+.mode-b:hover:not(.active){background:var(--paper)}
+
+/* ── PLAIN-ENGLISH EXPLAINER ── */
+.explain{
+  background:var(--paper);border:1px solid var(--rule2);border-left:2px solid var(--red);
+  padding:16px 20px;margin-top:22px;
+  display:grid;grid-template-columns:auto 1fr;gap:20px;align-items:start;
+}
+.explain-l{
+  font-family:'JetBrains Mono',monospace;font-size:8.5px;font-weight:600;
+  letter-spacing:0.14em;text-transform:uppercase;color:var(--red);
+  white-space:nowrap;display:flex;align-items:center;gap:8px;padding-top:2px;
+}
+.explain-l .ico{
+  width:15px;height:15px;border:1px solid var(--red);border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:9px;font-style:italic;
+  font-family:'Fraunces',serif;
+}
+.explain-t{font-size:13px;color:var(--ink2);line-height:1.62}
+.explain-t b{color:var(--ink);font-weight:500}
+.explain-t .hi{color:var(--green);font-weight:500}
+.explain-t .lo{color:var(--red);font-weight:500}
+.explain-t .mid{color:var(--amber);font-weight:500}
+
+/* ── CHART CAPTION ── */
+.caption{
+  font-family:'Fraunces',serif;font-style:italic;font-size:13px;font-weight:300;
+  color:var(--ink3);line-height:1.5;margin-top:16px;padding-left:14px;
+  border-left:1px solid var(--rule);max-width:84ch;
+}
+.caption b{font-style:normal;font-weight:500;color:var(--ink2)}
+
+/* Analysis title in doc head */
+.dh-analysis{
+  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;
+  letter-spacing:0.16em;text-transform:uppercase;color:var(--ink3);
+  display:flex;align-items:center;gap:10px;margin-bottom:8px;
+}
+.dh-analysis b{color:var(--red);font-weight:600}
+
+/* Field micro-hint — plain English under each input */
+.fhint{
+  font-size:10.5px;color:var(--ink4);line-height:1.42;margin-top:3px;
+  font-family:'Space Grotesk',sans-serif;letter-spacing:0;
+}
+/* Driver feature: friendly name + description */
+.wt-n{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:500;letter-spacing:-0.01em}
+.wt-code{font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:400;color:var(--ink4);letter-spacing:0.04em}
+.wt-d{
+  font-size:11px;color:var(--ink3);line-height:1.45;margin:3px 0 7px;max-width:40ch;
+  font-family:'Space Grotesk',sans-serif;font-weight:400;letter-spacing:0;
+}
+/* Scenario card description */
+.sc-card-desc{
+  font-size:11.5px;color:var(--ink3);line-height:1.45;margin:5px 0 9px;max-width:42ch;
+  font-family:'Space Grotesk',sans-serif;letter-spacing:0;
+}
+
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="ldr">
+    <div class="ldr-mark">MergerIQ<sup>beta</sup></div>
+    <div class="ldr-row"><span class="ldr-k">› establishing market feed</span><span class="ldr-v ldr-ok">OK</span></div>
+    <div class="ldr-row"><span class="ldr-k">› loading sector multiples [SaaS]</span><span class="ldr-v ldr-ok">OK</span></div>
+    <div class="ldr-row"><span class="ldr-k">› fetching comparable transactions</span><span class="ldr-v ldr-ok">6 found</span></div>
+    <div class="ldr-row"><span class="ldr-k">› initializing scoring model v3.2.1</span><span class="ldr-v ldr-ok">OK</span></div>
+    <div class="ldr-row"><span class="ldr-k">› compiling deal case 042</span><span class="ldr-v ldr-ok">OK</span></div>
+    <div class="ldr-row"><span class="ldr-k">› render verdict</span><span class="ldr-v ldr-ok">READY</span></div>
+  </div>
+</div>
+
+<!-- STATUS BAR / TICKER -->
+<div class="status">
+  <div class="status-fixed">
+    <div class="ld"></div>
+    <span>LIVE · NYSE 14:32:08 EST</span>
+  </div>
+  <div class="ticker-wrap">
+    <div class="ticker" id="ticker">
+      <!-- populated by JS for seamless loop -->
+    </div>
+  </div>
+  <div class="status-nav">
+    <a href="index.html">Home</a>
+    <a href="MergerIQ.html" class="active">The Screener</a>
+    <a href="Academy.html">Academy</a>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="app">
+  <div class="brand">
+    <svg class="brand-mk" viewBox="0 0 36 36">
+      <line class="bm-base" x1="2" y1="28" x2="34" y2="28"/>
+      <line class="bm-arm" x1="6" y1="6" x2="18" y2="28"/>
+      <line class="bm-arm" x1="30" y1="6" x2="18" y2="28"/>
+      <circle class="bm-node" cx="18" cy="28" r="2.6"/>
+      <line class="bm-thr" x1="26" y1="22" x2="26" y2="33"/>
+    </svg>
+    <div class="brand-txt">
+      <div class="brand-name"><b>Merger</b>IQ</div>
+      <div class="brand-sub">Deal Intelligence · beta</div>
+    </div>
+  </div>
+  <div class="nav-meta">
+    <div class="nm"><div class="nm-l">Case</div><div class="nm-v">042 / 2025</div></div>
+    <div class="nm"><div class="nm-l">Model</div><div class="nm-v">v3.2.1-stable</div></div>
+    <div class="nm"><div class="nm-l">Analyst</div><div class="nm-v">C. Lee</div></div>
+    <div class="nm"><div class="nm-l">Issued</div><div class="nm-v">22 May 26</div></div>
+  </div>
+</nav>
+
+<!-- PIPELINE STRIP — purpose + flow -->
+<div class="pipeline">
+  <div class="pl-intro">
+    <div class="pl-intro-l">What is this</div>
+    <div class="pl-intro-t">AI-powered M&amp;A deal screening. Enter the terms — the model returns a <em>completion probability</em>, kill criteria, and a committee-ready memo in roughly 200 ms.</div>
+  </div>
+  <div class="pl-steps">
+    <div class="pl-step done"><span class="pl-dot"></span><span>01 · Input</span></div>
+    <span class="pl-arrow">›</span>
+    <div class="pl-step done"><span class="pl-dot"></span><span>02 · Screen</span></div>
+    <span class="pl-arrow">›</span>
+    <div class="pl-step active"><span class="pl-dot"></span><span>03 · Verdict</span></div>
+    <span class="pl-arrow">›</span>
+    <div class="pl-step"><span class="pl-dot"></span><span>04 · Memo</span></div>
+  </div>
+</div>
+
+<!-- PAGE -->
+<div class="page">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-h">
+      <div class="sb-h-l"><span>§ 0.0  Deal Source</span><span class="ct">07 cases</span></div>
+      <div class="mode" id="dealMode">
+        <button class="mode-b" data-mode="live">Live<br/>Deal</button>
+        <button class="mode-b active" data-mode="concluded">Concluded<br/>Deal</button>
+        <button class="mode-b" data-mode="new">Analyze<br/>New</button>
+      </div>
+      <select class="deal-pick" id="dealPick" style="margin-top:12px">
+        <option>— Select a case —</option>
+        <option selected>Adobe / Figma — $20B · SaaS</option>
+        <option>MSFT / Activision — $68.7B · Gaming</option>
+        <option>Salesforce / Slack — $27.7B · SaaS</option>
+        <option>Broadcom / VMware — $61B · SaaS</option>
+        <option>Visa / Plaid — $5.3B · Fintech</option>
+        <option>Qualcomm / NXP — $44B · Hardware</option>
+        <option>Take-Two / Zynga — $12.7B · Gaming</option>
+      </select>
+    </div>
+
+    <div class="sb-body">
+      <div class="sb-grp"><span id="paramTitle">§ 0.1  Deal Parameters</span><span class="num">06</span></div>
+
+      <div class="field">
+        <div class="fl"><span>Target <span class="tip" tabindex="0" data-tip="The company being acquired. MergerIQ benchmarks it against comparable transactions in the same sector and size range.">i</span></span><span class="opt">required</span></div>
+        <input class="fi" id="inTarget" value="Figma" placeholder="Company name"/>
+        <div class="fhint">The company being bought.</div>
+      </div>
+
+      <div class="frow">
+        <div class="field">
+          <div class="fl">Industry <span class="tip" tabindex="0" data-tip="The sector the target operates in. Different industries face very different regulatory scrutiny — tech deals are watched for monopoly concerns, pharma for drug-pricing impact, and defense deals go through national-security reviews. Selecting the right industry ensures MergerIQ applies the correct benchmarks to your deal.">i</span></div>
+          <select class="fi" id="inIndustry">
+            <option>SaaS</option><option>Hardware</option>
+            <option>Fintech</option><option>Healthcare</option>
+            <option>Gaming</option><option>Marketplace</option>
+            <option>Defense</option><option>Telecom</option>
+            <option>Media</option><option>Consumer</option>
+            <option>Energy &amp; Utilities</option>
+            <option>Media &amp; Telecom</option>
+            <option>Pharma &amp; Biotech</option>
+            <option>Financial Services</option>
+            <option>Defense &amp; Aerospace</option>
+          </select>
+          <div class="fhint">What sector the company is in.</div>
+        </div>
+        <div class="field">
+          <div class="fl">Payment <span class="tip" tabindex="0" data-tip="How the buyer is paying. &lt;b&gt;Cash&lt;/b&gt; means target shareholders get money directly — clean and preferred by sellers. &lt;b&gt;Stock&lt;/b&gt; means they receive shares in the acquiring company — riskier, as the value can change. &lt;b&gt;Mixed&lt;/b&gt; is a combination of both, common in large deals to balance risk.">i</span></div>
+          <select class="fi" id="inPayment">
+            <option>Cash</option><option>Stock</option><option>Mixed</option>
+          </select>
+          <div class="fhint">How the buyer pays — cash, stock, or both.</div>
+        </div>
+      </div>
+
+      <div class="frow">
+        <div class="field">
+          <div class="fl">Revenue <span class="opt">$M</span> <span class="tip" tabindex="0" data-tip="The target's annual revenue — its total sales before any costs. MergerIQ compares the price paid against this to compute the revenue multiple.">i</span></div>
+          <input class="fi" id="inRevenue" value="400"/>
+          <div class="fhint">The company's yearly sales.</div>
+        </div>
+        <div class="field">
+          <div class="fl">EBITDA <span class="opt">$M</span> <span class="tip" tabindex="0" data-tip="EBITDA is the target's core operating profit — what it earns before interest, taxes, and accounting adjustments. It is the cleanest read on whether the underlying business actually makes money.">i</span></div>
+          <input class="fi" id="inEbitda" value="80"/>
+          <div class="fhint">Yearly profit from its core business.</div>
+        </div>
+      </div>
+
+      <div class="frow">
+        <div class="field">
+          <div class="fl">Deal Size <span class="opt">$M</span> <span class="tip" tabindex="0" data-tip="The total amount the buyer is paying to acquire the target. Deals over &lt;b&gt;$500M&lt;/b&gt; typically trigger regulatory review by the FTC or DOJ. Deals over &lt;b&gt;$1B&lt;/b&gt; almost always face a formal investigation.">i</span></div>
+          <input class="fi" id="inPrice" value="20,000"/>
+          <div class="fhint">Total price the buyer pays.</div>
+        </div>
+        <div class="field">
+          <div class="fl">Premium <span class="opt">%</span> <span class="tip" tabindex="0" data-tip="The extra amount the buyer pays above the target's current market price to convince shareholders to sell. 30–50% is typical; far higher signals overpayment risk.">i</span></div>
+          <input class="fi" id="inPremium" value="50"/>
+          <div class="fhint">Extra % paid above market price.</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="go">
+      <span class="go-l">
+        <span class="go-num">01 ›</span>
+        <span>Run Analysis</span>
+      </span>
+      <svg width="14" height="14" viewBox="0 0 13 13" fill="none">
+        <path d="M2.5 6.5h8M8 3.5l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- DOC HEADER -->
+    <div class="doc-head">
+      <div class="dh-meta">
+        <div class="cn">CASE <b>042</b></div>
+        <div>Filed <b>22 May 2026</b></div>
+        <div>Sector <b>SaaS</b></div>
+        <div>Confidence <b>0.71</b></div>
+        <div class="spc"></div>
+        <div>Verdict <b style="color:var(--red2)">DO NOT PROCEED</b></div>
+      </div>
+
+      <div class="dh-body">
+        <div class="dh-chapter">§ 1.0  /  Verdict</div>
+        <div>
+          <div class="dh-eyebrow">
+            <span class="dot"></span>
+            <span>MergerIQ Verdict — Final</span>
+            <span style="color:var(--ink5)">⟢</span>
+            <span>Adopted by Risk Committee</span>
+          </div>
+
+          <div class="dh-analysis"><span>Deliverable</span><span style="color:var(--ink5)">·</span><b>Adobe / Figma Analysis</b></div>
+
+          <div class="dh-deal">
+            <span>Adobe Inc.</span>
+            <span class="arrow">/</span>
+            <span>Figma Inc.</span>
+            <span class="meta">Sept 15, 2022 · $20,000M · Cash + Stock</span>
+          </div>
+
+          <div class="dh-verdict" aria-label="Do not proceed">
+            <span class="wrd w1">Do not</span><br/><em><span class="wrd w2">proceed.</span></em>
+          </div>
+
+          <div class="dh-deck">
+            Two thresholds breached. The price implies a multiple <em>more than triple</em> the SaaS peer set, and regulators will treat this as horizontal consolidation. Model recommends <em>terminate</em> at the present price; counter-bid below $14.2B materially shifts the verdict.
+          </div>
+        </div>
+
+        <!-- PROBABILITY BLOCK -->
+        <div class="prob-block">
+          <div class="prob-live">Calibrating · live</div>
+          <div class="pb-top">
+            <div style="display:flex;align-items:flex-start">
+              <span class="pb-fig" id="probFig" data-target="54.4">0.0</span>
+              <span class="pb-pct">%</span>
+            </div>
+            <div class="pb-rt">
+              <div>Completion probability</div>
+              <div>Base <b>51.4%</b></div>
+              <div>Adjusted <b>+3.0%</b></div>
+              <div>Threshold <b>≥ 65%</b></div>
+            </div>
+          </div>
+
+          <!-- Distribution curve -->
+          <div class="pb-curve">
+            <svg viewBox="0 0 360 90" preserveAspectRatio="none">
+              <!-- threshold line at x=234 (65%) -->
+              <line class="threshold-line" x1="234" y1="6" x2="234" y2="84" stroke="#1A5C35" stroke-width="1" stroke-dasharray="3 3" opacity="0"/>
+              <text class="threshold-text" x="238" y="14" fill="#1A5C35" font-family="JetBrains Mono" font-size="8" font-weight="500" opacity="0">THRESHOLD 65%</text>
+              <!-- distribution curve (gaussian-ish, peak at ~52%) -->
+              <path class="curve-fill" d="M0,86 C 36,86 60,84 80,76 C 100,68 120,46 144,30 C 170,16 192,10 216,18 C 240,28 264,52 290,72 C 314,82 340,86 360,86 L 360,90 L 0,90 Z" fill="#0C0B09" opacity="0.06"/>
+              <path class="curve-line" d="M0,86 C 36,86 60,84 80,76 C 100,68 120,46 144,30 C 170,16 192,10 216,18 C 240,28 264,52 290,72 C 314,82 340,86 360,86" fill="none" stroke="#0C0B09" stroke-width="1.2"/>
+              <!-- area below current deal in red -->
+              <path class="curve-fill" d="M0,86 C 36,86 60,84 80,76 C 100,68 120,46 144,30 C 170,16 192,10 196,17 L 196,90 L 0,90 Z" fill="#8B1A0E" opacity="0"/>
+              <!-- marker for this deal at x=196 (~54.4%) -->
+              <line class="curve-marker-line" x1="196" y1="0" x2="196" y2="90" stroke="#8B1A0E" stroke-width="1.5" opacity="0"/>
+              <circle class="curve-marker" cx="196" cy="17" r="4" fill="#8B1A0E" opacity="0"/>
+              <circle class="curve-marker-ring" cx="196" cy="17" r="9" fill="none" stroke="#8B1A0E" stroke-width="1" opacity="0"/>
+              <text class="curve-marker-label" x="200" y="11" fill="#8B1A0E" font-family="JetBrains Mono" font-size="8" font-weight="500" opacity="0">THIS DEAL</text>
+              <!-- tick marks -->
+              <g font-family="JetBrains Mono" font-size="7" fill="#A6A498">
+                <line x1="0" y1="86" x2="0" y2="89" stroke="#A6A498"/>
+                <line x1="90" y1="86" x2="90" y2="89" stroke="#A6A498"/>
+                <line x1="180" y1="86" x2="180" y2="89" stroke="#A6A498"/>
+                <line x1="270" y1="86" x2="270" y2="89" stroke="#A6A498"/>
+                <line x1="360" y1="86" x2="360" y2="89" stroke="#A6A498"/>
+              </g>
+            </svg>
+          </div>
+          <div class="pb-axis">
+            <span>0%</span><span>25%</span><span>50%</span><span class="here">→ 54.4%</span><span>100%</span>
+          </div>
+
+          <div class="pb-foot">
+            <span>Δ to threshold</span>
+            <span class="neg">−10.6 pp</span>
+          </div>
+          <div class="caption" style="margin-top:14px">This curve plots where a deal's completion probability falls across the full range of historical outcomes. Anything to the left of the dashed threshold sits in the zone where obstacles tend to outweigh momentum.</div>
+        </div>
+      </div>
+
+      <!-- COMPLETION PROBABILITY — PLAIN ENGLISH -->
+      <div style="padding:0 38px 40px 96px;position:relative;z-index:1;border-top:1px solid var(--rule2);padding-top:26px">
+        <div class="explain" style="margin-top:0">
+          <div class="explain-l"><span class="ico">i</span>What this means</div>
+          <div class="explain-t"><b>Completion probability.</b> <span class="hi">Above 70%</span> means the deal has strong fundamentals and a favorable regulatory environment. <span class="mid">Between 50–70%</span> means the deal is viable but faces real risks that need managing. <span class="lo">Below 50%</span> means significant obstacles exist — regulatory, financial, or market-related — that could prevent closing. Find where a deal's score lands on that scale to read its odds at a glance.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- § 2.0  METRICS -->
+    <section class="section">
+      <div class="sec-num">
+        <span class="n">§ 2.0</span>
+        <span class="l">Metrics</span>
+      </div>
+      <div class="sec-h">
+        <span class="sec-h-l">Deal Metrics</span>
+        <span class="sec-h-r">Four ratios · benchmarked vs. SaaS comparables ±$15B</span>
+      </div>
+
+      <div class="metrics">
+        <div class="mc a-mc">
+          <div class="mc-top"><span class="mc-l">EBITDA Multiple <span class="tip" tabindex="0" data-tip="How many times the target's core operating profit (EBITDA) the buyer is paying. &lt;b&gt;Above 30×&lt;/b&gt; is a red flag and can signal the deal is financially stretched.">i</span></span><span class="mc-flag a">High</span></div>
+          <div class="mc-v amber">77.8<span style="font-size:0.5em;color:var(--ink4)">×</span></div>
+          <div class="mc-gauge">
+            <svg viewBox="0 0 200 24" preserveAspectRatio="none">
+              <line x1="0" y1="18" x2="200" y2="18" stroke="#E8E4D8" stroke-width="1"/>
+              <line x1="60" y1="14" x2="60" y2="22" stroke="#6B6A60" stroke-width="1"/>
+              <text x="60" y="9" fill="#6B6A60" font-family="JetBrains Mono" font-size="7" text-anchor="middle">peer 23.3×</text>
+              <line x1="178" y1="10" x2="178" y2="22" stroke="#7A4A00" stroke-width="2"/>
+              <circle cx="178" cy="18" r="3.5" fill="#7A4A00"/>
+            </svg>
+          </div>
+          <div class="mc-s"><span>Sector avg <span class="pos">23.3×</span></span><span>+54.5 pp</span></div>
+        </div>
+
+        <div class="mc r-mc">
+          <div class="mc-top"><span class="mc-l">Revenue Multiple <span class="tip" tabindex="0" data-tip="How many times the target's annual revenue the buyer is paying. SaaS companies typically trade at 10–20×; hardware at 1–3×. Anything &lt;b&gt;above 20×&lt;/b&gt; is considered aggressive and may raise eyebrows with regulators and boards.">i</span></span><span class="mc-flag r">Breach</span></div>
+          <div class="mc-v red">50.0<span style="font-size:0.5em;color:var(--ink4)">×</span></div>
+          <div class="mc-gauge">
+            <svg viewBox="0 0 200 24" preserveAspectRatio="none">
+              <line x1="0" y1="18" x2="200" y2="18" stroke="#E8E4D8" stroke-width="1"/>
+              <line x1="60" y1="14" x2="60" y2="22" stroke="#6B6A60" stroke-width="1"/>
+              <text x="60" y="9" fill="#6B6A60" font-family="JetBrains Mono" font-size="7" text-anchor="middle">ceiling 15×</text>
+              <line x1="184" y1="10" x2="184" y2="22" stroke="#8B1A0E" stroke-width="2"/>
+              <circle cx="184" cy="18" r="3.5" fill="#8B1A0E"/>
+            </svg>
+          </div>
+          <div class="mc-s"><span>Threshold <span class="pos">15×</span></span><span style="color:var(--red)">+35× over</span></div>
+        </div>
+
+        <div class="mc g-mc">
+          <div class="mc-top"><span class="mc-l">EBITDA Margin</span><span class="mc-flag g">Healthy</span></div>
+          <div class="mc-v green">20.0<span style="font-size:0.5em;color:var(--ink4)">%</span></div>
+          <div class="mc-gauge">
+            <svg viewBox="0 0 200 24" preserveAspectRatio="none">
+              <line x1="0" y1="18" x2="200" y2="18" stroke="#E8E4D8" stroke-width="1"/>
+              <line x1="80" y1="14" x2="80" y2="22" stroke="#6B6A60" stroke-width="1"/>
+              <text x="80" y="9" fill="#6B6A60" font-family="JetBrains Mono" font-size="7" text-anchor="middle">peer 18%</text>
+              <line x1="100" y1="10" x2="100" y2="22" stroke="#1A5C35" stroke-width="2"/>
+              <circle cx="100" cy="18" r="3.5" fill="#1A5C35"/>
+            </svg>
+          </div>
+          <div class="mc-s"><span>Peer <span class="pos">18%</span></span><span style="color:var(--green)">+2 pp</span></div>
+        </div>
+
+        <div class="mc g-mc">
+          <div class="mc-top"><span class="mc-l">Market Score</span><span class="mc-flag g">Open</span></div>
+          <div class="mc-v">100<span style="font-size:0.5em;color:var(--ink4)">/100</span></div>
+          <div class="mc-gauge">
+            <svg viewBox="0 0 200 24" preserveAspectRatio="none">
+              <line x1="0" y1="18" x2="200" y2="18" stroke="#E8E4D8" stroke-width="1"/>
+              <line x1="120" y1="14" x2="120" y2="22" stroke="#6B6A60" stroke-width="1"/>
+              <text x="120" y="9" fill="#6B6A60" font-family="JetBrains Mono" font-size="7" text-anchor="middle">avg 60</text>
+              <line x1="196" y1="10" x2="196" y2="22" stroke="#0C0B09" stroke-width="2"/>
+              <circle cx="196" cy="18" r="3.5" fill="#0C0B09"/>
+            </svg>
+          </div>
+          <div class="mc-s"><span>VIX <span class="pos">16.7</span></span><span style="color:var(--green)">favorable</span></div>
+        </div>
+      </div>
+      <div class="caption">Each bar plots the deal's ratio (colored tick) against its sector benchmark (gray tick). When a tick sits far to the right of its benchmark, the buyer is paying well above the going rate — usually a sign the price is stretched.</div>
+    </section>
+
+    <!-- § 3.0  REASONING TRACE -->
+    <section class="section">
+      <div class="sec-num">
+        <span class="n">§ 3.0</span>
+        <span class="l">Reasoning</span>
+      </div>
+      <div class="sec-h">
+        <span class="sec-h-l">Under The Hood</span>
+        <span class="sec-h-r">Adobe / Figma · why this score · 12 steps · 184ms</span>
+      </div>
+
+      <div class="reasoning">
+        <div class="rsn-bar">
+          <div class="rsn-bar-l">
+            <span class="rsn-dot"></span>
+            <span>reasoning_trace · case_042.log</span>
+          </div>
+          <div class="rsn-bar-r">
+            <span>SEED <b>0xA42</b></span>
+            <span>STEPS <b>12</b></span>
+            <span>WALL <b>184ms</b></span>
+          </div>
+        </div>
+        <div class="rsn-body" id="rsn-body">
+          <div class="rsn-line"><span class="rsn-ts">00:000</span><span class="rsn-tag input">INPUT</span><span class="rsn-arrow">›</span><span class="rsn-msg">deal = <b>Adobe → Figma</b>, price=<b>$20.0B</b>, rev=<b>$400M</b>, ebitda=<b>$80M</b></span></div>
+          <div class="rsn-line"><span class="rsn-ts">00:008</span><span class="rsn-tag calc">CALC </span><span class="rsn-arrow">›</span><span class="rsn-msg">revenue_multiple = price / rev = 20000/400 = <b>50.0×</b></span></div>
+          <div class="rsn-line"><span class="rsn-ts">00:012</span><span class="rsn-tag calc">CALC </span><span class="rsn-arrow">›</span><span class="rsn-msg">ebitda_multiple = price / ebitda = 20000/80 = <b>77.8×</b></span></div>
+          <div class="rsn-line"><span class="rsn-ts">00:019</span><span class="rsn-tag check">CHECK</span><span class="rsn-arrow">›</span><span class="rsn-msg">sector_peer[SaaS] = 23.3× ;  delta = <span class="amb">+54.5 pp</span></span></div>
+          <div class="rsn-line"><span class="rsn-ts">00:024</span><span class="rsn-tag kill">KILL </span><span class="rsn-arrow">›</span><span class="rsn-msg">rev_mult > ceiling(15×)  <span class="red">→ FIRED rule R-01</span></span></div>
+          <div class="rsn-line"><span class="rsn-ts">00:031</span><span class="rsn-tag kill">KILL </span><span class="rsn-arrow">›</span><span class="rsn-msg">ebitda_mult > sector × 3.0  <span class="amb">→ ELEVATED rule R-02</span></span></div>
+          <div class="rsn-line"><span class="rsn-ts">00:047</span><span class="rsn-tag calc">CALC </span><span class="rsn-arrow">›</span><span class="rsn-msg">market_score = f(vix=16.7, rate=4.48, mult=23.3) = <span class="grn">0.997</span></span></div>
+          <div class="rsn-line"><span class="rsn-ts">00:062</span><span class="rsn-tag calc">CALC </span><span class="rsn-arrow">›</span><span class="rsn-msg">base_prob = logistic( Σ feature × weight ) = <b>51.4%</b></span></div>
+          <div class="rsn-line"><span class="rsn-ts">00:089</span><span class="rsn-tag calc">CALC </span><span class="rsn-arrow">›</span><span class="rsn-msg">market_adj = +3.0 pp  →  adjusted = <b>54.4%</b></span></div>
+          <div class="rsn-line"><span class="rsn-ts">00:118</span><span class="rsn-tag check">CHECK</span><span class="rsn-arrow">›</span><span class="rsn-msg">regulator_risk[horizontal_SaaS] = <span class="red">elevated</span> · DOJ 2nd request prob = 0.78</span></div>
+          <div class="rsn-line"><span class="rsn-ts">00:152</span><span class="rsn-tag check">CHECK</span><span class="rsn-arrow">›</span><span class="rsn-msg">54.4% < threshold(65%) <span class="red">∴ verdict = DO_NOT_PROCEED</span></span></div>
+          <div class="rsn-line"><span class="rsn-ts">00:184</span><span class="rsn-tag out">OUT  </span><span class="rsn-arrow">›</span><span class="rsn-msg">emit verdict=<b>terminate</b>, counter_bid_breakeven=<b>$14.2B</b><span class="rsn-cursor"></span></span></div>
+        </div>
+      </div>
+      <div class="explain">
+        <div class="explain-l"><span class="ico">i</span>What this means</div>
+        <div class="explain-t"><b>This shows exactly why your deal received the score it did</b> — which factors pushed the probability up and which pulled it down. Use it to understand where your deal is strong and where it is vulnerable before going into a board meeting or regulatory filing. For example, an unusually high price relative to sales or profit, or elevated regulatory risk, pulls a score down — while healthy margins and calm markets push it up.</div>
+      </div>
+    </section>
+
+    <!-- § 4.0  DRIVERS + KILL -->
+    <section class="section">
+      <div class="sec-num">
+        <span class="n">§ 4.0</span>
+        <span class="l">Signals</span>
+      </div>
+      <div class="sec-h">
+        <span class="sec-h-l">Model Signals</span>
+        <span class="sec-h-r">Drivers · weights · triggered rules</span>
+      </div>
+
+      <div class="drivers">
+        <div class="drv">
+          <div class="drv-t">§ 4.1  Prediction Drivers</div>
+          <div class="drv-st">The five things the model weighed most heavily when scoring this deal.</div>
+          <div class="weights" id="weights">
+            <div class="wt"><div class="wt-l"><div class="wt-n">Deal Size vs. Revenue <span class="wt-code">deal_to_revenue</span></div><div class="wt-d">How big the check is compared to the company's yearly sales. A huge price for modest sales is a warning sign.</div><div class="wt-b"><div class="wt-f first" data-w="100"></div></div></div><div class="wt-p">12.6%</div></div>
+            <div class="wt"><div class="wt-l"><div class="wt-n">Revenue Multiple <span class="wt-code">revenue_multiple</span></div><div class="wt-d">How many dollars the buyer pays for every $1 of yearly sales.</div><div class="wt-b"><div class="wt-f" data-w="98"></div></div></div><div class="wt-p">12.4%</div></div>
+            <div class="wt"><div class="wt-l"><div class="wt-n">Profit Multiple <span class="wt-code">ebitda_multiple</span></div><div class="wt-d">How many dollars the buyer pays for every $1 of operating profit.</div><div class="wt-b"><div class="wt-f" data-w="87"></div></div></div><div class="wt-p">11.0%</div></div>
+            <div class="wt"><div class="wt-l"><div class="wt-n">Premium Paid <span class="wt-code">premium</span></div><div class="wt-d">How far above the company's market price the buyer is willing to go.</div><div class="wt-b"><div class="wt-f" data-w="63"></div></div></div><div class="wt-p">8.0%</div></div>
+            <div class="wt"><div class="wt-l"><div class="wt-n">Industry <span class="wt-code">industry_encoded</span></div><div class="wt-d">The sector the company is in — it sets the benchmark and how closely regulators will look.</div><div class="wt-b"><div class="wt-f" data-w="59"></div></div></div><div class="wt-p">7.5%</div></div>
+          </div>
+        </div>
+
+        <div class="drv">
+          <div class="drv-t">§ 4.2  Kill Criteria — 2 firing</div>
+          <div class="drv-st">Two thresholds breached; analyst override required.</div>
+          <div class="kill-list">
+            <div class="ka">
+              <div class="ka-sev">
+                <div class="glyph">!</div>
+                <div class="code">R-01</div>
+              </div>
+              <div class="ka-body">
+                <div class="title">Elevated Revenue Multiple <span class="ts">· 00:024</span></div>
+                <div class="desc">50.0× exceeds the 15× threshold — significant overvaluation risk relative to SaaS comparables.</div>
+              </div>
+              <div class="ka-num">50.0×</div>
+            </div>
+            <div class="ka a">
+              <div class="ka-sev a">
+                <div class="glyph">▲</div>
+                <div class="code">R-02</div>
+              </div>
+              <div class="ka-body">
+                <div class="title">Aggressive EBITDA Multiple <span class="ts">· 00:031</span></div>
+                <div class="desc">77.8× requires exceptional sustained growth assumptions to justify the price paid.</div>
+              </div>
+              <div class="ka-num">77.8×</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="explain">
+        <div class="explain-l"><span class="ico">i</span>What this means</div>
+        <div class="explain-t"><b>Kill criteria</b> are the specific characteristics of your deal that most strongly predict failure based on historical transactions. They are not guaranteed deal-breakers, but they are exactly what a regulator, board, or financing party is likely to challenge. Each one is drawn from real deals that failed for the same reason.</div>
+      </div>
+    </section>
+
+    <!-- § 5.0  MARKET -->
+    <section class="section">
+      <div class="sec-num">
+        <span class="n">§ 5.0</span>
+        <span class="l">Market</span>
+      </div>
+      <div class="sec-h">
+        <span class="sec-h-l">Market Context for this Deal</span>
+        <span class="sec-h-r">Adobe / Figma · live at runtime · last tick 14:32:08</span>
+      </div>
+
+      <div class="market">
+        <div class="mk">
+          <div class="mk-l">Risk-Free Rate · 10Y <span class="tip" tabindex="0" data-tip="The benchmark borrowing rate for the economy. &lt;b&gt;High rates&lt;/b&gt; make deals more expensive to finance and buyers more cautious; &lt;b&gt;low rates&lt;/b&gt; fuel deal activity with cheap debt. MergerIQ factors the current rate into your prediction.">i</span></div>
+          <div class="mk-v">4.48<span style="font-size:0.5em;color:var(--ink4)">%</span></div>
+          <div class="mk-spark">
+            <svg viewBox="0 0 200 34" preserveAspectRatio="none">
+              <polyline class="spark-line" points="0,22 10,20 20,22 30,18 40,16 50,14 60,18 70,16 80,12 90,10 100,14 110,12 120,8 130,10 140,6 150,8 160,4 170,8 180,12 190,10 200,14" fill="none" stroke="#0C0B09" stroke-width="1.2"/>
+              <circle class="spark-end" cx="200" cy="14" r="2.5" fill="#0C0B09"/>
+            </svg>
+          </div>
+          <div class="mk-d"><span>30d low 4.21</span><span class="up">+27 bp</span></div>
+        </div>
+        <div class="mk">
+          <div class="mk-l">VIX · Volatility <span class="tip" tabindex="0" data-tip="The market's fear index. &lt;b&gt;Below 20&lt;/b&gt; means markets are calm and deal activity is typically high; &lt;b&gt;above 30&lt;/b&gt; means markets are stressed and deals are more likely to be paused or terminated. MergerIQ uses the live VIX to adjust your completion probability in real time.">i</span></div>
+          <div class="mk-v">16.7</div>
+          <div class="mk-spark">
+            <svg viewBox="0 0 200 34" preserveAspectRatio="none">
+              <polyline class="spark-line" points="0,8 10,12 20,10 30,14 40,12 50,16 60,14 70,18 80,16 90,20 100,18 110,22 120,20 130,24 140,22 150,26 160,24 170,28 180,26 190,28 200,26" fill="none" stroke="#0C0B09" stroke-width="1.2"/>
+              <circle class="spark-end" cx="200" cy="26" r="2.5" fill="#0C0B09"/>
+            </svg>
+          </div>
+          <div class="mk-d"><span>30d high 22.1</span><span class="dn">−5.4</span></div>
+        </div>
+        <div class="mk">
+          <div class="mk-l">SaaS Multiple · EV/Rev</div>
+          <div class="mk-v">23.3<span style="font-size:0.5em;color:var(--ink4)">×</span></div>
+          <div class="mk-spark">
+            <svg viewBox="0 0 200 34" preserveAspectRatio="none">
+              <polyline class="spark-line" points="0,20 10,18 20,22 30,16 40,18 50,14 60,12 70,16 80,10 90,12 100,8 110,10 120,6 130,8 140,4 150,8 160,10 170,6 180,8 190,4 200,6" fill="none" stroke="#0C0B09" stroke-width="1.2"/>
+              <circle class="spark-end" cx="200" cy="6" r="2.5" fill="#0C0B09"/>
+            </svg>
+          </div>
+          <div class="mk-d"><span>30d low 18.2×</span><span class="up">+2.4×</span></div>
+        </div>
+        <div class="mk">
+          <div class="mk-l">Market Score · Composite</div>
+          <div class="mk-v">0.997</div>
+          <div class="mk-spark">
+            <svg viewBox="0 0 200 34" preserveAspectRatio="none">
+              <polyline class="spark-line" points="0,16 10,14 20,18 30,12 40,16 50,10 60,14 70,8 80,12 90,6 100,10 110,4 120,8 130,6 140,4 150,2 160,4 170,2 180,4 190,2 200,2" fill="none" stroke="#1A5C35" stroke-width="1.4"/>
+              <circle class="spark-end" cx="200" cy="2" r="2.5" fill="#1A5C35"/>
+            </svg>
+          </div>
+          <div class="mk-d"><span>30d low 0.81</span><span class="up">+0.19</span></div>
+        </div>
+      </div>
+      <div class="explain">
+        <div class="explain-l"><span class="ico">i</span>What this means</div>
+        <div class="explain-t"><b>These are the live market conditions at the moment you ran this analysis.</b> The same deal can have very different outcomes depending on when it happens — a deal in a high-VIX, rising-rate environment faces a much harder path than the same deal in a stable market. MergerIQ adjusts the score accordingly. For example, calm volatility and a stable rate add to a deal's odds, while a spike in either pulls them down.</div>
+      </div>
+      <div class="caption">Sparklines show the 30-day trend for each signal. Calm volatility and a stable rate are tailwinds for any deal; rising ones are headwinds.</div>
+    </section>
+
+    <!-- § 6.0  SCENARIOS / FAN -->
+    <section class="section">
+      <div class="sec-num">
+        <span class="n">§ 6.0</span>
+        <span class="l">Scenarios</span>
+      </div>
+      <div class="sec-h">
+        <span class="sec-h-l">Adobe / Figma — Scenario Analysis</span>
+        <span class="sec-h-r">5-year hold · Monte Carlo · 10,000 paths</span>
+      </div>
+
+      <div class="scenarios">
+        <div class="fan">
+          <div class="fan-t">§ 6.1  Probability Fan</div>
+          <div class="fan-st">Five-year value distribution. Median crosses break-even in year 3.</div>
+          <div class="fan-svg">
+            <svg viewBox="0 0 460 240" preserveAspectRatio="none">
+              <!-- y axis -->
+              <line x1="40" y1="20" x2="40" y2="210" stroke="#DCD8CB" stroke-width="1"/>
+              <!-- x axis -->
+              <line x1="40" y1="210" x2="450" y2="210" stroke="#DCD8CB" stroke-width="1"/>
+              <!-- grid -->
+              <g stroke="#F0ECDF" stroke-width="1">
+                <line x1="40" y1="60" x2="450" y2="60"/>
+                <line x1="40" y1="110" x2="450" y2="110"/>
+                <line x1="40" y1="160" x2="450" y2="160"/>
+              </g>
+              <!-- break-even line -->
+              <line x1="40" y1="135" x2="450" y2="135" stroke="#8B1A0E" stroke-width="1" stroke-dasharray="3 3" opacity="0.5"/>
+              <text x="450" y="131" fill="#8B1A0E" font-family="JetBrains Mono" font-size="8" font-weight="500" text-anchor="end">break-even</text>
+
+              <!-- upside fill (P10–P90) -->
+              <path class="fan-fill" d="M 40,135 L 122,118 L 204,92 L 286,62 L 368,38 L 450,18 L 450,68 L 368,90 L 286,114 L 204,140 L 122,148 L 40,135 Z" fill="#1A5C35"/>
+              <!-- downside fill (P10–P50) -->
+              <path class="fan-fill dn" d="M 40,135 L 122,148 L 204,168 L 286,184 L 368,196 L 450,206 L 450,176 L 368,170 L 286,160 L 204,148 L 122,144 L 40,135 Z" fill="#8B1A0E"/>
+              <!-- median line -->
+              <path class="fan-path" d="M 40,135 L 122,128 L 204,118 L 286,108 L 368,98 L 450,92" stroke="#0C0B09" stroke-width="1.6" fill="none"/>
+              <!-- upside line -->
+              <path class="fan-path" d="M 40,135 L 122,118 L 204,92 L 286,62 L 368,38 L 450,18" stroke="#1A5C35" stroke-width="1.2" fill="none" stroke-dasharray="2 2"/>
+              <!-- downside line -->
+              <path class="fan-path" d="M 40,135 L 122,148 L 204,168 L 286,184 L 368,196 L 450,206" stroke="#8B1A0E" stroke-width="1.2" fill="none" stroke-dasharray="2 2"/>
+
+              <!-- end markers -->
+              <circle cx="450" cy="18" r="3" fill="#1A5C35"/>
+              <circle cx="450" cy="92" r="3" fill="#0C0B09"/>
+              <circle cx="450" cy="206" r="3" fill="#8B1A0E"/>
+
+              <!-- x labels -->
+              <g font-family="JetBrains Mono" font-size="8" fill="#6B6A60">
+                <text x="40" y="226" text-anchor="middle">Y0</text>
+                <text x="122" y="226" text-anchor="middle">Y1</text>
+                <text x="204" y="226" text-anchor="middle">Y2</text>
+                <text x="286" y="226" text-anchor="middle">Y3</text>
+                <text x="368" y="226" text-anchor="middle">Y4</text>
+                <text x="450" y="226" text-anchor="middle">Y5</text>
+              </g>
+              <!-- y labels -->
+              <g font-family="JetBrains Mono" font-size="8" fill="#6B6A60">
+                <text x="34" y="24" text-anchor="end">3.0×</text>
+                <text x="34" y="64" text-anchor="end">2.0×</text>
+                <text x="34" y="114" text-anchor="end">1.5×</text>
+                <text x="34" y="139" text-anchor="end">1.0×</text>
+                <text x="34" y="164" text-anchor="end">0.7×</text>
+                <text x="34" y="214" text-anchor="end">0.3×</text>
+              </g>
+            </svg>
+          </div>
+          <div class="fan-legend">
+            <div class="lg"><div class="lg-swatch" style="background:#1A5C35;opacity:0.4"></div><span>P90 upside</span></div>
+            <div class="lg"><div class="lg-swatch" style="background:#0C0B09"></div><span>P50 median</span></div>
+            <div class="lg"><div class="lg-swatch" style="background:#8B1A0E;opacity:0.4"></div><span>P10 downside</span></div>
+          </div>
+        </div>
+
+        <div class="sc-cards">
+          <div class="sc-card">
+            <div class="sc-card-l">
+              <span class="sc-card-tag">↑ P90</span>
+              <div>
+                <div class="sc-card-n">Upside</div>
+                <div class="sc-card-desc">The best case — if almost everything goes right: fast growth and strong profit margins.</div>
+                <div class="sc-card-grid">
+                  <div class="sc-stat">Growth<b>25%</b></div>
+                  <div class="sc-stat">Margin<b>25.0%</b></div>
+                  <div class="sc-stat">Exit<b>85.6×</b></div>
+                  <div class="sc-stat">Risk<b style="color:var(--green)">Low</b></div>
+                </div>
+              </div>
+            </div>
+            <div class="sc-irr">28<span class="sml">%</span></div>
+          </div>
+
+          <div class="sc-card">
+            <div class="sc-card-l">
+              <span class="sc-card-tag">→ P50</span>
+              <div>
+                <div class="sc-card-n">Base</div>
+                <div class="sc-card-desc">The most likely case — steady, expected performance with no big surprises.</div>
+                <div class="sc-card-grid">
+                  <div class="sc-stat">Growth<b>15%</b></div>
+                  <div class="sc-stat">Margin<b>20.0%</b></div>
+                  <div class="sc-stat">Exit<b>70.0×</b></div>
+                  <div class="sc-stat">Risk<b style="color:var(--amber)">Medium</b></div>
+                </div>
+              </div>
+            </div>
+            <div class="sc-irr amber">18<span class="sml">%</span></div>
+          </div>
+
+          <div class="sc-card">
+            <div class="sc-card-l">
+              <span class="sc-card-tag">↓ P10</span>
+              <div>
+                <div class="sc-card-n">Downside</div>
+                <div class="sc-card-desc">The worst case — if things go wrong: slow growth and pressure on profit margins.</div>
+                <div class="sc-card-grid">
+                  <div class="sc-stat">Growth<b>5%</b></div>
+                  <div class="sc-stat">Margin<b>15.0%</b></div>
+                  <div class="sc-stat">Exit<b>54.4×</b></div>
+                  <div class="sc-stat">Risk<b style="color:var(--red)">High</b></div>
+                </div>
+              </div>
+            </div>
+            <div class="sc-irr red">8<span class="sml">%</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="explain">
+        <div class="explain-l"><span class="ico">i</span>What this means</div>
+        <div class="explain-t"><b>Scenario analysis stress-tests the deal three ways.</b> The <span class="hi">Upside</span> is the best case if things go well, the <span class="mid">Base</span> is the most likely outcome, and the <span class="lo">Downside</span> is the worst case if things go poorly. The big number on each card is the <b>yearly return (IRR)</b> — roughly how much you'd earn per year on the money invested. As a rule of thumb, a wide gap between the upside and downside means the outcome is highly uncertain, while a low return even in the upside case is a sign the price leaves little room for error.</div>
+      </div>
+      <div class="caption">The fan shows the five-year value range: <b>P90 upside</b> (green), <b>P50 median</b> (black), <b>P10 downside</b> (red). The later the median line crosses break-even, the longer the money is at risk before the deal starts to pay off.</div>
+    </section>
+
+    <!-- § 7.0  COMPS -->
+    <section class="section">
+      <div class="sec-num">
+        <span class="n">§ 7.0</span>
+        <span class="l">Comparables</span>
+      </div>
+      <div class="sec-h">
+        <span class="sec-h-l">Adobe / Figma — Comparable Transactions</span>
+        <span class="sec-h-r">SaaS · ±$15B · 2016–2022</span>
+      </div>
+
+      <div class="comps">
+        <div class="scatter">
+          <div class="scatter-h">
+            <span class="scatter-t">§ 7.1  EV/Rev × Premium</span>
+            <span class="scatter-t" style="color:var(--ink3)">n = 7</span>
+          </div>
+          <div class="scatter-svg">
+            <svg viewBox="0 0 340 280" preserveAspectRatio="xMidYMid meet">
+              <!-- axes -->
+              <line x1="40" y1="240" x2="320" y2="240" stroke="#DCD8CB" stroke-width="1"/>
+              <line x1="40" y1="20" x2="40" y2="240" stroke="#DCD8CB" stroke-width="1"/>
+              <!-- grid -->
+              <g stroke="#F0ECDF" stroke-width="1">
+                <line x1="40" y1="80" x2="320" y2="80"/>
+                <line x1="40" y1="140" x2="320" y2="140"/>
+                <line x1="40" y1="200" x2="320" y2="200"/>
+                <line x1="110" y1="20" x2="110" y2="240"/>
+                <line x1="180" y1="20" x2="180" y2="240"/>
+                <line x1="250" y1="20" x2="250" y2="240"/>
+              </g>
+              <!-- threshold zone (rev mult > 15×) -->
+              <rect x="40" y="20" width="280" height="100" fill="#8B1A0E" opacity="0.04"/>
+              <text x="316" y="34" font-family="JetBrains Mono" font-size="8" fill="#8B1A0E" text-anchor="end" font-weight="500">DANGER ZONE · &gt;15× rev</text>
+              <line x1="40" y1="120" x2="320" y2="120" stroke="#8B1A0E" stroke-width="0.8" stroke-dasharray="2 3" opacity="0.5"/>
+
+              <!-- completed deals (circles) -->
+              <!-- Salesforce/Slack: rev 30.7×, premium ~55%, COMPLETED -->
+              <g>
+                <circle class="dot-in scatter-dot" cx="215" cy="46" r="6" fill="#1A5C35" opacity="0.9"/>
+                <text x="225" y="49" font-family="JetBrains Mono" font-size="9" fill="#0C0B09">CRM / Slack</text>
+              </g>
+              <!-- MSFT/LinkedIn: rev 8.7×, premium ~50%, COMPLETED -->
+              <g>
+                <circle class="dot-in scatter-dot" cx="200" cy="178" r="6" fill="#1A5C35" opacity="0.9"/>
+                <text x="210" y="181" font-family="JetBrains Mono" font-size="9" fill="#0C0B09">MSFT / LNKD</text>
+              </g>
+              <!-- Oracle/Cerner: rev 5.1×, premium ~20%, COMPLETED -->
+              <g>
+                <circle class="dot-in scatter-dot" cx="100" cy="206" r="6" fill="#1A5C35" opacity="0.9"/>
+                <text x="110" y="209" font-family="JetBrains Mono" font-size="9" fill="#0C0B09">ORCL / CERN</text>
+              </g>
+              <!-- Take-Two/Zynga: rev 5.4×, premium ~64%, COMPLETED -->
+              <g>
+                <circle class="dot-in scatter-dot" cx="240" cy="200" r="6" fill="#1A5C35" opacity="0.9"/>
+                <text x="248" y="203" font-family="JetBrains Mono" font-size="9" fill="#0C0B09">TTWO / ZNGA</text>
+              </g>
+              <!-- Broadcom/VMware: rev 4.5×, premium 44%, COMPLETED -->
+              <g>
+                <circle class="dot-in scatter-dot" cx="178" cy="212" r="6" fill="#1A5C35" opacity="0.9"/>
+                <text x="186" y="215" font-family="JetBrains Mono" font-size="9" fill="#0C0B09">AVGO / VMW</text>
+              </g>
+              <!-- Visa/Plaid: rev 53×, premium 100%+, TERMINATED -->
+              <g>
+                <circle class="dot-in scatter-dot" cx="300" cy="32" r="6" fill="none" stroke="#8B1A0E" stroke-width="1.5"/>
+                <text x="262" y="20" font-family="JetBrains Mono" font-size="9" fill="#8B1A0E">V / Plaid ✕</text>
+              </g>
+
+              <!-- ADBE/FIG — THIS DEAL -->
+              <g>
+                <circle class="dot-in scatter-dot" cx="240" cy="38" r="9" fill="none" stroke="#8B1A0E" stroke-width="1.5" stroke-dasharray="2 2"/>
+                <circle class="dot-in scatter-dot" cx="240" cy="38" r="5" fill="#8B1A0E"/>
+                <line x1="240" y1="38" x2="270" y2="68" stroke="#8B1A0E" stroke-width="1"/>
+                <text x="272" y="72" font-family="JetBrains Mono" font-size="9" fill="#8B1A0E" font-weight="700">ADBE / FIG ←</text>
+              </g>
+
+              <!-- axis labels -->
+              <text x="40" y="258" font-family="JetBrains Mono" font-size="8" fill="#6B6A60">0%</text>
+              <text x="110" y="258" font-family="JetBrains Mono" font-size="8" fill="#6B6A60">25%</text>
+              <text x="180" y="258" font-family="JetBrains Mono" font-size="8" fill="#6B6A60">50%</text>
+              <text x="250" y="258" font-family="JetBrains Mono" font-size="8" fill="#6B6A60">75%</text>
+              <text x="320" y="258" font-family="JetBrains Mono" font-size="8" fill="#6B6A60">100%+</text>
+              <text x="180" y="272" font-family="JetBrains Mono" font-size="8" fill="#A6A498" text-anchor="middle" letter-spacing="0.12em">PREMIUM →</text>
+
+              <text x="34" y="244" font-family="JetBrains Mono" font-size="8" fill="#6B6A60" text-anchor="end">0×</text>
+              <text x="34" y="200" font-family="JetBrains Mono" font-size="8" fill="#6B6A60" text-anchor="end">10×</text>
+              <text x="34" y="140" font-family="JetBrains Mono" font-size="8" fill="#6B6A60" text-anchor="end">20×</text>
+              <text x="34" y="80" font-family="JetBrains Mono" font-size="8" fill="#6B6A60" text-anchor="end">40×</text>
+              <text x="34" y="24" font-family="JetBrains Mono" font-size="8" fill="#6B6A60" text-anchor="end">60×</text>
+              <text x="22" y="130" font-family="JetBrains Mono" font-size="8" fill="#A6A498" letter-spacing="0.12em" transform="rotate(-90,22,130)" text-anchor="middle">↑ EV / REVENUE</text>
+            </svg>
+          </div>
+          <div class="scatter-legend">
+            <span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:#1A5C35;vertical-align:middle;margin-right:6px"></span>Completed</span>
+            <span><span style="display:inline-block;width:7px;height:7px;border-radius:50%;border:1.5px solid #8B1A0E;vertical-align:middle;margin-right:6px"></span>Terminated</span>
+          </div>
+        </div>
+
+        <div class="comp-table">
+          <div class="ct-h">
+            <span class="ct-h-t">§ 7.2  Transactions</span>
+            <span class="ct-h-n">6 deals · sorted by EV</span>
+          </div>
+          <table>
+            <thead>
+              <tr>
+                <th>Transaction</th>
+                <th>Yr</th>
+                <th class="r">EV <span class="tip" tabindex="0" data-tip="Enterprise Value — the total price paid to buy the company.">i</span></th>
+                <th class="r">EV/Rev <span class="tip" tabindex="0" data-tip="Price paid for every $1 of the company's yearly sales.">i</span></th>
+                <th class="r">EV/EBITDA <span class="tip" tabindex="0" data-tip="Price paid for every $1 of the company's operating profit.">i</span></th>
+                <th>Outcome</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="p">Salesforce / Slack</td>
+                <td class="m">'20</td>
+                <td class="m r">$27.7B</td>
+                <td class="m r">30.7×</td>
+                <td class="m r">—</td>
+                <td><span class="badge c">Completed</span></td>
+              </tr>
+              <tr>
+                <td class="p">Microsoft / LinkedIn</td>
+                <td class="m">'16</td>
+                <td class="m r">$26.2B</td>
+                <td class="m r">8.7×</td>
+                <td class="m r">29.1×</td>
+                <td><span class="badge c">Completed</span></td>
+              </tr>
+              <tr>
+                <td class="p">Oracle / Cerner</td>
+                <td class="m">'22</td>
+                <td class="m r">$28.3B</td>
+                <td class="m r">5.1×</td>
+                <td class="m r">30.9×</td>
+                <td><span class="badge c">Completed</span></td>
+              </tr>
+              <tr>
+                <td class="p">Broadcom / VMware</td>
+                <td class="m">'22</td>
+                <td class="m r">$61.0B</td>
+                <td class="m r">4.5×</td>
+                <td class="m r">22.4×</td>
+                <td><span class="badge c">Completed</span></td>
+              </tr>
+              <tr>
+                <td class="p">Take-Two / Zynga</td>
+                <td class="m">'22</td>
+                <td class="m r">$12.7B</td>
+                <td class="m r">5.4×</td>
+                <td class="m r">28.0×</td>
+                <td><span class="badge c">Completed</span></td>
+              </tr>
+              <tr>
+                <td class="p">Visa / Plaid</td>
+                <td class="m">'20</td>
+                <td class="m r">$5.3B</td>
+                <td class="m r">53.0×</td>
+                <td class="m r">—</td>
+                <td><span class="badge t">Terminated</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="explain">
+        <div class="explain-l"><span class="ico">i</span>What this means</div>
+        <div class="explain-t"><b>Comparable transactions</b> are real historical deals most similar to yours — matched by industry, deal size, payment type, and market conditions. If comparable deals completed at similar multiples, that is a positive signal; if they were blocked, study why — those reasons are likely relevant to yours too. For example, if the closest comparable by price was blocked or terminated, treat it as a warning the deal could face the same scrutiny.</div>
+      </div>
+      <div class="caption">Each dot is a past deal plotted by premium (x) and price-to-revenue (y). Deals in the shaded <b>danger zone</b> above 15× revenue rarely clear cleanly — the further into it a deal sits, the harder its path.</div>
+    </section>
+
+    <!-- § 8.0  AUTOPSY -->
+    <section class="section">
+      <div class="sec-num">
+        <span class="n">§ 8.0</span>
+        <span class="l">Outcome</span>
+      </div>
+      <div class="autopsy">
+        <div class="autopsy-h">
+          <div class="autopsy-t">Deal Autopsy <em style="font-style:normal;color:var(--ink4);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.16em;margin-left:12px">· What actually happened</em></div>
+          <div class="autopsy-sub">15 months · Sept 2022 → Dec 2023</div>
+        </div>
+        <div class="autopsy-dek">
+          The model's verdict matched reality. Adobe / Figma was <em>terminated</em> in December 2023 after EU and UK regulators signalled extended Phase-II probes. Adobe paid a $1.0B break fee.
+        </div>
+
+        <div class="timeline">
+          <div class="tl-row">
+            <div class="tl-step">
+              <div class="tl-date">15 Sept 2022</div>
+              <div class="tl-event">Deal announced</div>
+              <div class="tl-note">$20B cash + stock · 50× rev multiple</div>
+            </div>
+            <div class="tl-step">
+              <div class="tl-date">Nov 2022</div>
+              <div class="tl-event">Stockholder approval</div>
+              <div class="tl-note">Both boards signed off · no internal friction</div>
+            </div>
+            <div class="tl-step">
+              <div class="tl-date">June 2023</div>
+              <div class="tl-event">EU Phase II opened</div>
+              <div class="tl-note">Horizontal-overlap concerns flagged · CMA followed</div>
+            </div>
+            <div class="tl-step">
+              <div class="tl-date">Nov 2023</div>
+              <div class="tl-event">Statement of objections</div>
+              <div class="tl-note">EU + UK both objected · remedies inadequate</div>
+            </div>
+            <div class="tl-step red">
+              <div class="tl-date">18 Dec 2023</div>
+              <div class="tl-event">Terminated</div>
+              <div class="tl-note">Adobe paid <b style="color:var(--red)">$1.0B</b> break fee · Figma resumes IPO path</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- § 9.0  MEMO CTA -->
+    <section class="section" style="padding-bottom:80px">
+      <div class="sec-num">
+        <span class="n">§ 9.0</span>
+        <span class="l">Memo</span>
+      </div>
+      <button class="memo-cta">
+        <div class="memo-l">
+          <div class="memo-eyebrow">
+            <span class="dot"></span>
+            <span>AI-generated · ~30s</span>
+          </div>
+          <div class="memo-title">Generate the full <b>deal memo</b>.</div>
+          <div class="memo-sub">Long-form analysis: thesis, risk narrative, counter-bid math, regulator path, and committee-ready recommendation. Drafted in your house style.</div>
+        </div>
+        <div class="memo-r">
+          <span>Draft</span>
+          <span class="arrow">→</span>
+        </div>
+      </button>
+    </section>
+
+    <!-- § 10.0  ABOUT / COLOPHON -->
+    <section class="section" style="padding-bottom:64px">
+      <div class="sec-num">
+        <span class="n">§ 10.0</span>
+        <span class="l">Colophon</span>
+      </div>
+      <div class="sec-h">
+        <span class="sec-h-l">About MergerIQ</span>
+        <span class="sec-h-r">Dataset · performance · author</span>
+      </div>
+
+      <div class="about">
+        <div class="about-l">
+          <div class="about-eyebrow">
+            <span>The Product</span>
+            <span style="color:var(--ink5)">⟢</span>
+            <span>Currently in beta</span>
+          </div>
+          <div class="about-h">
+            Built at the intersection of <em>machine learning</em>, financial analysis, and real-time market data.
+          </div>
+          <div class="about-body">
+            <p>MergerIQ is an AI-powered deal screening platform. The model is trained on <b>98 hand-curated M&amp;A transactions</b> spanning 2015–2025 — across SaaS, hardware, fintech, healthcare, defense, telecom, and consumer sectors — each with its real outcome and the market conditions at the time of the deal.</p>
+            <p>On held-out test data it reaches a cross-validated accuracy of <b>85.5%</b> and a <b>ROC-AUC of 0.821</b> — strong, well-calibrated performance for deal screening. Every prediction is adjusted in real time using live market signals: <b>VIX</b>, the <b>10-year Treasury yield</b>, and <b>sector valuation multiples</b>. Each deal also comes with an AI-generated memo — thesis, risks, and recommendation in your house style.</p>
+            <p>MergerIQ is currently in beta. The dataset and model are <em>actively being expanded</em>.</p>
+          </div>
+        </div>
+
+        <div class="about-r">
+          <div class="about-r-t">§ 10.1  By the Numbers</div>
+          <div class="about-r-st">The model in numbers.</div>
+
+          <div class="spec">
+            <span class="spec-k">Training set</span>
+            <span class="spec-v big">98 <span style="font-size:0.55em;color:var(--ink4)">deals</span></span>
+          </div>
+          <div class="spec">
+            <span class="spec-k">Coverage</span>
+            <span class="spec-v">2015 → 2025</span>
+          </div>
+          <div class="spec">
+            <span class="spec-k">Sectors</span>
+            <span class="spec-v">8 verticals</span>
+          </div>
+          <div class="spec">
+            <span class="spec-k">Cross-val accuracy</span>
+            <span class="spec-v big g">85.5<span style="font-size:0.55em;color:var(--ink4)">%</span></span>
+          </div>
+          <div class="spec">
+            <span class="spec-k">ROC-AUC</span>
+            <span class="spec-v big g">0.821</span>
+          </div>
+          <div class="spec">
+            <span class="spec-k">Live signals</span>
+            <span class="spec-v">VIX · 10Y · Multiples</span>
+          </div>
+          <div class="spec">
+            <span class="spec-k">Deal memos</span>
+            <span class="spec-v">AI-generated</span>
+          </div>
+          <div class="spec">
+            <span class="spec-k">Status</span>
+            <span class="spec-v" style="color:var(--red)">beta</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- BYLINE / CONTACT -->
+      <div class="about-foot">
+        <div class="about-foot-l">
+          <div class="about-byline">Founder · MergerIQ</div>
+          <div class="about-name"><b>Riya</b> Pradhan</div>
+          <div class="about-affil">Incoming Georgetown McDonough MSBA '26 · M&amp;A, corporate development, financial advisory — let's connect.</div>
+        </div>
+        <a class="about-cta" href="https://www.linkedin.com/in/riya-pradhan/" target="_blank" rel="noopener">
+          <span>Reach Out · LinkedIn</span>
+          <span class="arr">›</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <div class="foot">
+      <span>© 2026 MergerIQ · Proprietary &amp; confidential · Patent pending</span>
+      <span>Model output. Not investment advice.</span>
+      <span><a href="#">↑ Top</a></span>
+    </div>
+
+  </main>
+</div>
+
+<script>
+// Loader
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('gone');
+    // Kick off probability counter shortly after loader exits
+    setTimeout(startCounter, 600);
+  }, 1900);
+});
+
+// Probability counter — counts up to target value
+function startCounter() {
+  const el = document.getElementById('probFig');
+  if (!el) return;
+  const target = parseFloat(el.dataset.target);
+  const dur = 1400;
+  const start = performance.now();
+  function tick(now) {
+    const t = Math.min(1, (now - start) / dur);
+    // easeOutCubic
+    const e = 1 - Math.pow(1 - t, 3);
+    const v = (target * e).toFixed(1);
+    el.textContent = v;
+    if (t < 1) requestAnimationFrame(tick);
+    else el.textContent = target.toFixed(1);
+  }
+  requestAnimationFrame(tick);
+}
+
+// Ticker — duplicate content for seamless infinite loop
+(function buildTicker(){
+  const items = [
+    {sym:'SPX',  val:'5,748.12', d:'+0.34%', up:true},
+    {sym:'NDX',  val:'20,431',   d:'+0.51%', up:true},
+    {sym:'10Y',  val:'4.48%',    d:'+3bp',   up:true},
+    {sym:'VIX',  val:'16.7',     d:'−0.4',   up:false},
+    {sym:'DXY',  val:'103.4',    d:'+0.12%', up:true},
+    {sym:'WTI',  val:'72.18',    d:'−1.12%', up:false},
+    {sym:'GOLD', val:'2,418',    d:'+0.62%', up:true},
+    {sym:'BTC',  val:'68,431',   d:'+2.14%', up:true},
+    {sym:'ADBE', val:'528.40',   d:'+0.81%', up:true},
+    {sym:'CRM',  val:'292.10',   d:'−0.42%', up:false},
+    {sym:'MSFT', val:'427.18',   d:'+0.34%', up:true},
+    {sym:'SaaS', val:'EV/Rev 23.3×', d:'+2.4×', up:true},
+  ];
+  const html = items.map(i =>
+    `<span class="tk">${i.sym} <b>${i.val}</b> <span class="${i.up?'tk-up':'tk-dn'}">${i.d}</span></span>`
+  ).join('');
+  document.getElementById('ticker').innerHTML = html + html;
+})();
+
+// Animate weight bars on scroll-in
+const wIO = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.wt-f').forEach(f => {
+        f.style.width = f.dataset.w + '%';
+      });
+      wIO.unobserve(e.target);
+    }
+  });
+}, {threshold: 0.3});
+const wEl = document.getElementById('weights');
+if (wEl) wIO.observe(wEl);
+
+// Deal pick — surface the selection to feel responsive
+document.getElementById('dealPick')?.addEventListener('change', (e) => {
+  applyCase(e.target.value);
+});
+
+/* ─────────── INFO TOOLTIPS (shared, JS-positioned) ─────────── */
+(function(){
+  const tip = document.createElement('div');
+  tip.id = 'tooltip';
+  document.body.appendChild(tip);
+  let active = null;
+  function show(el){
+    const txt = el.getAttribute('data-tip');
+    if(!txt) return;
+    active = el;
+    tip.innerHTML = txt;
+    tip.classList.add('on');
+    position(el);
+  }
+  function position(el){
+    const r = el.getBoundingClientRect();
+    tip.style.left = '-9999px';
+    tip.classList.remove('above','below');
+    // measure
+    const tw = tip.offsetWidth, th = tip.offsetHeight;
+    let above = r.top > th + 16;
+    let cx = r.left + r.width/2;
+    let left = cx - tw/2;
+    left = Math.max(10, Math.min(left, window.innerWidth - tw - 10));
+    let top = above ? r.top - th - 9 : r.bottom + 9;
+    tip.style.left = left + 'px';
+    tip.style.top = top + 'px';
+    tip.classList.add(above ? 'above' : 'below');
+    // arrow x relative to tooltip
+    const ax = Math.max(10, Math.min(cx - left, tw - 10));
+    tip.style.setProperty('--ax', ax + 'px');
+  }
+  function hide(){ active = null; tip.classList.remove('on'); }
+  document.addEventListener('mouseover', (e)=>{
+    const t = e.target.closest('.tip');
+    if(t) show(t);
+  });
+  document.addEventListener('mouseout', (e)=>{
+    const t = e.target.closest('.tip');
+    if(t && active === t) hide();
+  });
+  document.addEventListener('focusin', (e)=>{
+    const t = e.target.closest && e.target.closest('.tip');
+    if(t) show(t);
+  });
+  document.addEventListener('focusout', hide);
+  window.addEventListener('scroll', ()=>{ if(active) position(active); }, true);
+  window.addEventListener('resize', ()=>{ if(active) position(active); });
+})();
+
+/* ─────────── DEAL MODE + CASE PICKER ─────────── */
+const CASES = {
+  'Adobe / Figma — $20B · SaaS':            {t:'Figma',      ind:'SaaS',     pay:'Mixed', rev:'400',   ebitda:'80',   price:'20,000', prem:'50'},
+  'MSFT / Activision — $68.7B · Gaming':    {t:'Activision', ind:'Gaming',   pay:'Cash',  rev:'8,700', ebitda:'3,500',price:'68,700', prem:'45'},
+  'Salesforce / Slack — $27.7B · SaaS':     {t:'Slack',      ind:'SaaS',     pay:'Mixed', rev:'900',   ebitda:'30',   price:'27,700', prem:'55'},
+  'Broadcom / VMware — $61B · SaaS':        {t:'VMware',     ind:'SaaS',     pay:'Mixed', rev:'13,350',ebitda:'4,800',price:'61,000', prem:'44'},
+  'Visa / Plaid — $5.3B · Fintech':         {t:'Plaid',      ind:'Fintech',  pay:'Cash',  rev:'100',   ebitda:'10',   price:'5,300',  prem:'100'},
+  'Qualcomm / NXP — $44B · Hardware':       {t:'NXP',        ind:'Hardware', pay:'Cash',  rev:'9,500', ebitda:'2,700',price:'44,000', prem:'34'},
+  'Take-Two / Zynga — $12.7B · Gaming':     {t:'Zynga',      ind:'Gaming',   pay:'Mixed', rev:'2,800', ebitda:'400',  price:'12,700', prem:'64'},
+};
+function setVal(id,v){const el=document.getElementById(id); if(el) el.value=v;}
+function applyCase(name){
+  const c = CASES[name];
+  if(!c) return;
+  setVal('inTarget',c.t);
+  const ind=document.getElementById('inIndustry'); if(ind) ind.value=c.ind;
+  const pay=document.getElementById('inPayment'); if(pay) pay.value=c.pay;
+  setVal('inRevenue',c.rev); setVal('inEbitda',c.ebitda);
+  setVal('inPrice',c.price); setVal('inPremium',c.prem);
+}
+function clearInputs(){
+  ['inTarget','inRevenue','inEbitda','inPrice','inPremium'].forEach(id=>setVal(id,''));
+  const t=document.getElementById('inTarget'); if(t) t.focus();
+}
+(function(){
+  const modeWrap = document.getElementById('dealMode');
+  const pick = document.getElementById('dealPick');
+  const title = document.getElementById('paramTitle');
+  if(!modeWrap) return;
+  modeWrap.querySelectorAll('.mode-b').forEach(btn=>{
+    btn.addEventListener('click', ()=>{
+      modeWrap.querySelectorAll('.mode-b').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      const mode = btn.dataset.mode;
+      if(mode === 'new'){
+        pick.style.display = 'none';
+        if(title) title.textContent = '§ 0.1  Analyze New Deal';
+        clearInputs();
+      } else {
+        pick.style.display = '';
+        if(title) title.textContent = '§ 0.1  Deal Parameters';
+        if(mode === 'live'){
+          // a "live" deal in market — seed with the open MSFT/Activision-style case
+          pick.value = 'MSFT / Activision — $68.7B · Gaming';
+        } else {
+          pick.value = 'Adobe / Figma — $20B · SaaS';
+        }
+        applyCase(pick.value);
+      }
+    });
+  });
+})();
+
+// Generic "in view" observer for staggered reveals
+function observeIn(selector, opts = {}) {
+  const { stagger = 60, threshold = 0.18, root = null } = opts;
+  const els = document.querySelectorAll(selector);
+  if (!els.length) return;
+  const io = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        const i = [...entry.target.parentElement.querySelectorAll(selector)].indexOf(entry.target);
+        setTimeout(() => entry.target.classList.add('in'), i * stagger);
+        io.unobserve(entry.target);
+      }
+    });
+  }, { threshold, root });
+  els.forEach((el) => io.observe(el));
+}
+
+// Sparklines: draw in
+const sparkIO = new IntersectionObserver((entries) => {
+  entries.forEach((e) => {
+    if (e.isIntersecting) {
+      e.target.classList.add('in');
+      sparkIO.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.3 });
+document.querySelectorAll('.spark-line, .spark-end').forEach((el) => sparkIO.observe(el));
+
+// Scatter dots stagger
+const dotIO = new IntersectionObserver((entries) => {
+  entries.forEach((e) => {
+    if (e.isIntersecting) {
+      const dots = [...e.target.closest('svg').querySelectorAll('.dot-in')];
+      dots.forEach((d, i) => setTimeout(() => d.classList.add('in'), 80 + i * 90));
+      dotIO.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.25 });
+document.querySelectorAll('.scatter-svg svg').forEach((el) => dotIO.observe(el));
+
+// Fan chart paths
+const fanIO = new IntersectionObserver((entries) => {
+  entries.forEach((e) => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.fan-path').forEach((p, i) => {
+        setTimeout(() => p.classList.add('in'), i * 220);
+      });
+      e.target.querySelectorAll('.fan-fill').forEach((p, i) => {
+        setTimeout(() => p.classList.add('in'), 100 + i * 220);
+      });
+      fanIO.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.25 });
+document.querySelectorAll('.fan-svg svg').forEach((el) => fanIO.observe(el));
+
+// Reasoning trace — line stagger
+const rsnIO = new IntersectionObserver((entries) => {
+  entries.forEach((e) => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.rsn-line').forEach((l, i) => {
+        setTimeout(() => l.classList.add('in'), i * 90);
+      });
+      rsnIO.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.2 });
+document.querySelectorAll('#rsn-body').forEach((el) => rsnIO.observe(el));
+
+// Timeline steps
+const tlIO = new IntersectionObserver((entries) => {
+  entries.forEach((e) => {
+    if (e.isIntersecting) {
+      e.target.querySelectorAll('.tl-step').forEach((s, i) => {
+        setTimeout(() => s.classList.add('in'), i * 140);
+      });
+      tlIO.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.25 });
+document.querySelectorAll('.timeline').forEach((el) => tlIO.observe(el));
+</script>
+
+</body>
+</html>

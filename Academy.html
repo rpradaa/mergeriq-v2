@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MergerIQ Academy — M&A, in plain English</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;700&family=Fraunces:ital,opsz,wght@0,9..144,100;0,9..144,200;0,9..144,300;0,9..144,400;1,9..144,100;1,9..144,200;1,9..144,300;1,9..144,400&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --ink:#0C0B09;--ink2:#27261F;--ink3:#6B6A60;--ink4:#A6A498;--ink5:#CFCDC3;
+  --cream:#F4F1E8;--cream2:#EEEAE0;--paper:#FAF7EF;--white:#FFFEFA;
+  --rule:#DCD8CB;--rule2:#E8E4D8;--rule3:#F0ECDF;
+  --red:#8B1A0E;--red2:#B5260E;--red-bg:rgba(139,26,14,0.07);
+  --green:#1A5C35;--amber:#7A4A00;
+}
+html{scroll-behavior:smooth}
+body{
+  font-family:'Space Grotesk',sans-serif;background:var(--cream);color:var(--ink);
+  -webkit-font-smoothing:antialiased;font-size:13px;line-height:1.5;text-rendering:optimizeLegibility;
+}
+body::before{content:'';position:fixed;inset:0;background-image:radial-gradient(rgba(12,11,9,0.018) 1px,transparent 1px);background-size:3px 3px;pointer-events:none;z-index:1}
+
+/* TOP NAV */
+.topnav{position:sticky;top:0;z-index:200;background:var(--ink);color:rgba(255,255,255,0.7);height:34px;display:flex;align-items:center;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.04em;border-bottom:1px solid #000;padding:0 22px}
+.tn-l{display:flex;align-items:center;gap:14px}
+.tn-ld{width:5px;height:5px;border-radius:50%;background:#22C55E;box-shadow:0 0 0 0 rgba(34,197,94,0.45);animation:tnpulse 2.2s ease infinite}
+@keyframes tnpulse{0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.5)}50%{box-shadow:0 0 0 5px rgba(34,197,94,0)}}
+.tn-links{display:flex;align-items:center}
+.tn-link{color:rgba(255,255,255,0.55);text-decoration:none;padding:0 16px;height:34px;display:flex;align-items:center;letter-spacing:0.16em;text-transform:uppercase;font-size:9.5px;border-left:1px solid rgba(255,255,255,0.1);transition:all 0.15s}
+.tn-link:hover{color:#fff;background:rgba(255,255,255,0.04)}
+.tn-link.active{color:#fff}
+.tn-link.active::before{content:'';width:5px;height:5px;border-radius:50%;background:var(--red2);margin-right:8px}
+
+.wrap{max-width:1180px;margin:0 auto;padding:0 48px;position:relative;z-index:2}
+
+/* HEADER */
+.ac-head{position:relative;border-bottom:1px solid var(--rule);overflow:hidden}
+.ac-head-grid{position:absolute;inset:0;background-image:linear-gradient(var(--rule3) 1px,transparent 1px),linear-gradient(90deg,var(--rule3) 1px,transparent 1px);background-size:44px 44px;mask-image:radial-gradient(ellipse 70% 80% at 20% 20%,#000,transparent 72%);-webkit-mask-image:radial-gradient(ellipse 70% 80% at 20% 20%,#000,transparent 72%);opacity:0.7}
+.ac-head-in{position:relative;padding:70px 0 54px}
+.ac-eyebrow{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink4);display:flex;align-items:center;gap:14px;margin-bottom:28px}
+.ac-eyebrow .dot{width:5px;height:5px;border-radius:50%;background:var(--red)}
+.ac-title{font-family:'Fraunces',serif;font-size:72px;font-weight:200;letter-spacing:-0.045em;line-height:0.96;margin-bottom:26px}
+.ac-title em{font-style:italic;color:var(--red);font-weight:300}
+.ac-sub{font-family:'Fraunces',serif;font-size:19px;font-weight:300;color:var(--ink2);line-height:1.5;max-width:60ch;border-left:1px solid var(--ink);padding-left:18px}
+.ac-meta{display:flex;gap:0;margin-top:36px;border:1px solid var(--rule);background:var(--white);width:fit-content}
+.ac-meta-i{padding:16px 26px;border-right:1px solid var(--rule2)}
+.ac-meta-i:last-child{border-right:none}
+.ac-meta-l{font-family:'JetBrains Mono',monospace;font-size:8.5px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink4);margin-bottom:6px}
+.ac-meta-v{font-family:'Fraunces',serif;font-size:22px;font-weight:300;font-style:italic;letter-spacing:-0.02em;color:var(--ink)}
+
+/* CURRICULUM */
+.sec-h{display:flex;align-items:baseline;justify-content:space-between;padding:54px 0 20px;border-bottom:1px solid var(--ink)}
+.sec-h-l{display:flex;align-items:baseline;gap:18px}
+.sec-h-num{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;letter-spacing:0.02em}
+.sec-h-t{font-family:'Fraunces',serif;font-size:30px;font-weight:300;font-style:italic;letter-spacing:-0.02em}
+.sec-h-r{font-family:'JetBrains Mono',monospace;font-size:9.5px;color:var(--ink3);letter-spacing:0.08em}
+
+.toc{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--rule);border-top:none;background:var(--white);margin-bottom:8px}
+.toc-i{display:grid;grid-template-columns:46px 1fr auto;gap:16px;align-items:center;padding:20px 24px;border-right:1px solid var(--rule2);border-bottom:1px solid var(--rule2);text-decoration:none;color:inherit;transition:background 0.18s}
+.toc-i:nth-child(even){border-right:none}
+.toc-i:hover{background:var(--paper)}
+.toc-n{font-family:'JetBrains Mono',monospace;font-size:11px;color:var(--ink4);letter-spacing:0.06em}
+.toc-t{font-family:'Fraunces',serif;font-size:17px;font-weight:300;letter-spacing:-0.01em;color:var(--ink)}
+.toc-t .mins{display:block;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink4);letter-spacing:0.1em;margin-top:4px}
+.toc-lock{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.12em;text-transform:uppercase}
+.toc-lock.free{color:var(--green)}
+.toc-lock.locked{color:var(--ink4)}
+
+/* LESSON */
+.lesson{padding:56px 0;border-bottom:1px solid var(--rule2);position:relative}
+.lesson-tag{font-family:'JetBrains Mono',monospace;font-size:9.5px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink4);display:flex;align-items:center;gap:14px;margin-bottom:18px}
+.lesson-tag .free{color:var(--green)}
+.lesson-grid{display:grid;grid-template-columns:300px 1fr;gap:56px;align-items:start}
+.lesson-h{font-family:'Fraunces',serif;font-size:38px;font-weight:200;letter-spacing:-0.035em;line-height:1.04;color:var(--ink);position:sticky;top:60px}
+.lesson-h .ln{display:block;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500;letter-spacing:0.1em;color:var(--red);margin-bottom:14px}
+.lesson-body{font-family:'Fraunces',serif;font-size:16px;font-weight:300;color:var(--ink2);line-height:1.7;letter-spacing:-0.003em;max-width:64ch}
+.lesson-body p{margin-bottom:18px}
+.lesson-body p:last-child{margin-bottom:0}
+.lesson-body b{font-weight:500;color:var(--ink);font-style:normal}
+.lesson-body em{font-style:italic;color:var(--red);font-weight:400}
+.lesson-body h4{font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink);margin:28px 0 12px;padding-top:18px;border-top:1px solid var(--rule2)}
+.keyterm{display:inline-block;background:var(--paper);border:1px solid var(--rule);padding:1px 7px;border-radius:2px;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:500;color:var(--ink);font-style:normal}
+.pullquote{font-family:'Fraunces',serif;font-style:italic;font-size:21px;font-weight:300;color:var(--ink);line-height:1.4;border-left:2px solid var(--red);padding:6px 0 6px 20px;margin:26px 0}
+
+/* PAYWALL */
+.paywall{position:relative;margin:8px 0 0;border:1px solid var(--rule)}
+.pw-locked{position:relative;max-height:340px;overflow:hidden;background:var(--white)}
+.pw-locked .lesson{border-bottom:none;padding:48px 38px}
+.pw-locked::after{content:'';position:absolute;left:0;right:0;bottom:0;height:260px;background:linear-gradient(180deg,rgba(250,247,239,0) 0%,rgba(250,247,239,0.85) 55%,var(--paper) 100%)}
+.pw-gate{
+  position:relative;z-index:3;background:var(--ink);color:var(--cream);
+  padding:48px 44px;display:grid;grid-template-columns:1.3fr 1fr;gap:48px;align-items:center;overflow:hidden;
+}
+.pw-gate::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--red)}
+.pw-gate::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 88% 30%,rgba(139,26,14,0.22),transparent 55%);pointer-events:none}
+.pw-l{position:relative}
+.pw-eyebrow{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:rgba(255,255,255,0.45);display:flex;align-items:center;gap:12px;margin-bottom:16px}
+.pw-eyebrow .lk{font-size:11px}
+.pw-h{font-family:'Fraunces',serif;font-size:34px;font-weight:200;font-style:italic;letter-spacing:-0.035em;line-height:1.08;color:var(--cream);margin-bottom:16px}
+.pw-h b{font-style:normal;font-weight:300}
+.pw-list{display:flex;flex-direction:column;gap:9px;margin-top:18px}
+.pw-li{display:flex;align-items:center;gap:12px;font-size:13px;color:rgba(255,255,255,0.7)}
+.pw-li .ck{color:#7CE69F;font-family:'JetBrains Mono',monospace;font-size:12px}
+.pw-r{position:relative;text-align:center;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.12);padding:34px 28px}
+.pw-price{font-family:'Fraunces',serif;font-size:72px;font-weight:200;font-style:italic;letter-spacing:-0.05em;line-height:1;color:var(--cream)}
+.pw-price .cur{font-size:34px;vertical-align:top;color:rgba(255,255,255,0.6)}
+.pw-price-sub{font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.16em;text-transform:uppercase;color:rgba(255,255,255,0.45);margin-top:8px}
+.pw-btn{display:flex;align-items:center;justify-content:center;gap:14px;background:var(--cream);color:var(--ink);text-decoration:none;padding:15px 22px;font-size:14px;font-weight:500;margin-top:24px;transition:all 0.2s;cursor:pointer;border:none;width:100%;font-family:'Space Grotesk',sans-serif}
+.pw-btn:hover{background:#fff}
+.pw-btn .arr{font-family:'Fraunces',serif;font-style:italic;font-size:20px;font-weight:200}
+.pw-note{font-family:'JetBrains Mono',monospace;font-size:8.5px;letter-spacing:0.1em;color:rgba(255,255,255,0.35);margin-top:14px;text-transform:uppercase}
+
+.foot{max-width:1180px;margin:0 auto;padding:30px 48px;display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:9px;color:var(--ink4);letter-spacing:0.1em;text-transform:uppercase;position:relative;z-index:2}
+.foot a{color:var(--ink3);text-decoration:none}
+.rv{opacity:0;transform:translateY(14px);transition:opacity 0.7s cubic-bezier(0.4,0,0.2,1),transform 0.7s cubic-bezier(0.4,0,0.2,1)}
+.rv.in{opacity:1;transform:translateY(0)}
+
+/* ── LIFECYCLE ROADMAP ── */
+.road-strip{display:grid;grid-template-columns:repeat(6,1fr);border:1px solid var(--rule);border-top:none;background:var(--white)}
+.road-step{padding:22px 16px 20px;border-right:1px solid var(--rule2);position:relative}
+.road-step:last-child{border-right:none}
+.road-step.here{background:var(--ink);color:var(--cream)}
+.road-n{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:500;letter-spacing:0.14em;color:var(--ink4);margin-bottom:10px;display:flex;align-items:center;gap:7px}
+.road-step.here .road-n{color:rgba(255,255,255,0.5)}
+.road-step.here .road-n::after{content:'YOU ARE HERE';color:var(--cream);background:var(--red);padding:1px 5px;border-radius:2px;font-size:7px;letter-spacing:0.1em}
+.road-t{font-family:'Fraunces',serif;font-size:17px;font-weight:300;letter-spacing:-0.01em;line-height:1.1;margin-bottom:7px}
+.road-d{font-size:10.5px;line-height:1.45;color:var(--ink3)}
+.road-step.here .road-d{color:rgba(255,255,255,0.6)}
+
+/* ── GLOSSARY ── */
+.gloss-tools{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:18px 0 22px}
+.gloss-search{position:relative;flex:1;max-width:360px}
+.gloss-search input{width:100%;padding:11px 14px 11px 36px;border:1px solid var(--rule);background:var(--white);font-family:'Space Grotesk',sans-serif;font-size:13px;color:var(--ink);border-radius:0}
+.gloss-search input:focus{outline:none;border-color:var(--ink)}
+.gloss-search svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);opacity:0.4}
+.gloss-cats{display:flex;gap:8px;font-family:'JetBrains Mono',monospace;font-size:9px;letter-spacing:0.1em;text-transform:uppercase}
+.gcat{padding:7px 12px;border:1px solid var(--rule);color:var(--ink3);cursor:pointer;transition:all 0.15s;background:none;font-family:inherit;font-size:inherit;letter-spacing:inherit}
+.gcat:hover{border-color:var(--ink2)}
+.gcat.active{background:var(--ink);color:var(--cream);border-color:var(--ink)}
+.gloss-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border:1px solid var(--rule);background:var(--white)}
+.gterm{padding:20px 22px;border-right:1px solid var(--rule2);border-bottom:1px solid var(--rule2);transition:background 0.15s}
+.gterm:hover{background:var(--paper)}
+.gterm-top{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:9px;gap:10px}
+.gterm-t{font-family:'Fraunces',serif;font-size:18px;font-weight:300;letter-spacing:-0.01em;color:var(--ink)}
+.gterm-tag{font-family:'JetBrains Mono',monospace;font-size:7.5px;font-weight:500;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink4);white-space:nowrap;padding-top:5px}
+.gterm-d{font-size:12.5px;color:var(--ink2);line-height:1.55}
+.gterm-d b{font-weight:500;color:var(--ink)}
+.gloss-more{display:flex;align-items:center;justify-content:center;gap:12px;padding:18px;border:1px solid var(--rule);border-top:none;background:var(--paper);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink3)}
+.gloss-more a{color:var(--red);text-decoration:none;font-weight:500}
+.gloss-empty{padding:40px;text-align:center;color:var(--ink4);font-family:'Fraunces',serif;font-style:italic;font-size:16px;grid-column:1/-1}
+
+/* ── CHEAT SHEET ── */
+.cheat{border:1px solid var(--rule);background:var(--white);overflow:hidden}
+.cheat table{width:100%;border-collapse:collapse}
+.cheat th{padding:11px 18px;text-align:left;font-family:'JetBrains Mono',monospace;font-size:8.5px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--ink4);border-bottom:1px solid var(--rule)}
+.cheat th.r,.cheat td.r{text-align:right}
+.cheat td{padding:13px 18px;font-size:13px;color:var(--ink2);border-bottom:1px solid var(--rule2)}
+.cheat tbody tr:last-child td{border-bottom:none}
+.cheat tbody tr:hover td{background:var(--paper)}
+.cheat td.s{font-family:'Fraunces',serif;font-size:16px;font-weight:300;color:var(--ink)}
+.cheat td.m{font-family:'JetBrains Mono',monospace;font-size:12px;color:var(--ink)}
+.cheat td.hot{color:var(--red);font-weight:500}
+
+/* ── QUIZ ── */
+.quiz{border:1px solid var(--rule);background:var(--white);margin-top:8px}
+.quiz-bar{display:flex;align-items:center;justify-content:space-between;padding:16px 24px;border-bottom:1px solid var(--rule2);background:var(--paper)}
+.quiz-bar-l{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink4)}
+.quiz-prog{display:flex;align-items:center;gap:12px}
+.quiz-prog-track{width:140px;height:5px;background:var(--rule3);position:relative;overflow:hidden}
+.quiz-prog-fill{position:absolute;left:0;top:0;bottom:0;background:var(--ink);width:0;transition:width 0.4s cubic-bezier(0.4,0,0.2,1)}
+.quiz-prog-n{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink3);letter-spacing:0.04em}
+.quiz-body{padding:30px 32px}
+.quiz-qn{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--red);margin-bottom:14px}
+.quiz-q{font-family:'Fraunces',serif;font-size:23px;font-weight:300;letter-spacing:-0.02em;color:var(--ink);line-height:1.25}
+.quiz-opts{display:flex;flex-direction:column;gap:10px;margin-top:20px}
+.quiz-opt{display:flex;align-items:flex-start;gap:14px;padding:15px 18px;border:1px solid var(--rule);background:var(--white);cursor:pointer;transition:all 0.15s;text-align:left;font-family:'Space Grotesk',sans-serif;font-size:14px;color:var(--ink2);line-height:1.45}
+.quiz-opt:hover:not(:disabled){border-color:var(--ink2);background:var(--paper)}
+.quiz-opt .key{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600;color:var(--ink4);flex-shrink:0;width:16px}
+.quiz-opt.correct{border-color:var(--green);background:var(--green-bg)}
+.quiz-opt.correct .key{color:var(--green)}
+.quiz-opt.wrong{border-color:var(--red);background:var(--red-bg)}
+.quiz-opt.wrong .key{color:var(--red)}
+.quiz-opt:disabled{cursor:default}
+.quiz-fb{margin-top:18px;padding:16px 18px;border-left:2px solid var(--ink);background:var(--paper);font-size:13px;line-height:1.6;color:var(--ink2);display:none}
+.quiz-fb.show{display:block}
+.quiz-fb.ok{border-left-color:var(--green)}
+.quiz-fb.no{border-left-color:var(--red)}
+.quiz-fb b{font-weight:600;color:var(--ink)}
+.quiz-foot{display:flex;align-items:center;justify-content:space-between;padding:18px 32px;border-top:1px solid var(--rule2)}
+.quiz-next{display:inline-flex;align-items:center;gap:12px;background:var(--ink);color:var(--cream);border:none;padding:13px 22px;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;opacity:0.35;pointer-events:none}
+.quiz-next.ready{opacity:1;pointer-events:auto}
+.quiz-next:hover{background:#000}
+.quiz-next .arr{font-family:'Fraunces',serif;font-style:italic;font-size:18px;font-weight:200}
+.quiz-score{font-family:'JetBrains Mono',monospace;font-size:10px;color:var(--ink3);letter-spacing:0.06em}
+.quiz-score b{color:var(--ink);font-weight:600}
+.quiz-result{padding:44px 32px;text-align:center;display:none}
+.quiz-result.show{display:block}
+.quiz-result-l{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--ink4);margin-bottom:14px}
+.quiz-result-score{font-family:'Fraunces',serif;font-size:72px;font-weight:200;font-style:italic;letter-spacing:-0.04em;line-height:1;color:var(--green)}
+.quiz-result-score.low{color:var(--amber)}
+.quiz-result-msg{font-family:'Fraunces',serif;font-size:18px;font-weight:300;color:var(--ink2);margin-top:14px}
+.quiz-retry{margin-top:22px;background:none;border:1px solid var(--rule);padding:11px 20px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;text-transform:uppercase;color:var(--ink3);cursor:pointer;transition:all 0.15s}
+.quiz-retry:hover{border-color:var(--ink);color:var(--ink)}
+
+/* ── CERTIFICATE ── */
+.cert-intro{display:grid;grid-template-columns:1fr auto;gap:40px;align-items:center;border:1px solid var(--rule);background:var(--white);padding:30px 34px;margin-top:8px}
+.cert-intro-h{font-family:'Fraunces',serif;font-size:24px;font-weight:300;letter-spacing:-0.02em;color:var(--ink);margin-bottom:8px}
+.cert-intro-p{font-size:13px;color:var(--ink3);line-height:1.55;max-width:54ch}
+.cert-form{display:flex;gap:10px;align-items:center;margin-top:18px}
+.cert-form input{padding:12px 14px;border:1px solid var(--rule);background:var(--paper);font-family:'Space Grotesk',sans-serif;font-size:14px;color:var(--ink);width:280px}
+.cert-form input:focus{outline:none;border-color:var(--ink)}
+.cert-form button{background:var(--ink);color:var(--cream);border:none;padding:12px 20px;font-family:'Space Grotesk',sans-serif;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;white-space:nowrap}
+.cert-form button:hover{background:#000}
+.cert-seal{width:96px;height:96px;flex-shrink:0}
+.cert{position:relative;margin-top:20px;background:var(--paper);border:1px solid var(--ink);padding:6px;display:none}
+.cert.show{display:block}
+.cert-inner{border:1px solid var(--rule);padding:48px 56px;position:relative;background:linear-gradient(135deg,var(--white),var(--paper));text-align:center;overflow:hidden}
+.cert-inner::before{content:'';position:absolute;inset:0;background-image:linear-gradient(var(--rule3) 1px,transparent 1px),linear-gradient(90deg,var(--rule3) 1px,transparent 1px);background-size:30px 30px;opacity:0.4;-webkit-mask-image:radial-gradient(ellipse 70% 70% at 50% 50%,transparent 40%,#000);mask-image:radial-gradient(ellipse 70% 70% at 50% 50%,transparent 40%,#000)}
+.cert-corner{position:absolute;width:24px;height:24px;border:1px solid var(--ink3)}
+.cert-corner.tl{top:14px;left:14px;border-right:none;border-bottom:none}
+.cert-corner.tr{top:14px;right:14px;border-left:none;border-bottom:none}
+.cert-corner.bl{bottom:14px;left:14px;border-right:none;border-top:none}
+.cert-corner.br{bottom:14px;right:14px;border-left:none;border-top:none}
+.cert-c{position:relative}
+.cert-mk{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:24px}
+.cert-mk svg{width:30px;height:30px;overflow:visible}
+.cert-mk span{font-family:'Fraunces',serif;font-size:18px;font-weight:300;letter-spacing:-0.03em}
+.cert-mk span b{font-weight:400}
+.cert-l{font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:500;letter-spacing:0.28em;text-transform:uppercase;color:var(--ink4);margin-bottom:18px}
+.cert-name{font-family:'Fraunces',serif;font-size:46px;font-weight:200;font-style:italic;letter-spacing:-0.03em;color:var(--ink);line-height:1.05;padding-bottom:18px;border-bottom:1px solid var(--rule);display:inline-block;margin-bottom:18px}
+.cert-desc{font-family:'Fraunces',serif;font-size:15px;font-weight:300;color:var(--ink2);max-width:46ch;margin:0 auto;line-height:1.5}
+.cert-meta{display:flex;justify-content:center;gap:46px;margin-top:30px}
+.cert-meta-i{text-align:center}
+.cert-meta-l{font-family:'JetBrains Mono',monospace;font-size:8px;font-weight:500;letter-spacing:0.18em;text-transform:uppercase;color:var(--ink4);margin-bottom:6px}
+.cert-meta-v{font-family:'Fraunces',serif;font-size:15px;font-weight:300;font-style:italic;color:var(--ink)}
+.cert-actions{display:flex;gap:10px;justify-content:center;margin-top:20px}
+.cert-actions button{background:none;border:1px solid var(--rule);padding:11px 18px;font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--ink3);cursor:pointer;transition:all 0.15s;display:inline-flex;align-items:center;gap:9px}
+.cert-actions button:hover{border-color:var(--ink);color:var(--ink)}
+@media print{
+  body>*{display:none!important}
+  .cert,.cert.show{display:block!important;border:none;position:absolute;top:0;left:0;right:0;margin:0}
+  .cert-actions{display:none!important}
+}
+
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-thumb{background:var(--rule);border-radius:2px}
+
+@media(max-width:900px){
+  .ac-title{font-size:50px}
+  .toc{grid-template-columns:1fr}
+  .toc-i{border-right:none}
+  .lesson-grid{grid-template-columns:1fr;gap:24px}
+  .lesson-h{position:static}
+  .pw-gate{grid-template-columns:1fr;gap:28px}
+}
+</style>
+</head>
+<body>
+
+<div class="topnav">
+  <div class="tn-l"><span class="tn-ld"></span><span>MERGERIQ ACADEMY · M&amp;A 101</span></div>
+  <div class="tn-links">
+    <a class="tn-link" href="index.html">Home</a>
+    <a class="tn-link" href="MergerIQ.html">The Screener</a>
+    <a class="tn-link active" href="Academy.html">Academy</a>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="ac-head">
+  <div class="ac-head-grid"></div>
+  <div class="wrap">
+    <div class="ac-head-in">
+      <div class="ac-eyebrow"><span class="dot"></span><span>MergerIQ Academy</span><span style="color:var(--ink5)">⟢</span><span>The deal lifecycle, decoded</span></div>
+      <h1 class="ac-title">Mergers &amp; acquisitions,<br/>in <em>plain English.</em></h1>
+      <p class="ac-sub">A self-contained course on how deals actually work — written so someone with zero finance background can follow along, and detailed enough that someone in the room can sharpen up. From "what is M&amp;A" to reading a live deal like an analyst.</p>
+      <div class="ac-meta">
+        <div class="ac-meta-i"><div class="ac-meta-l">Lessons</div><div class="ac-meta-v">7</div></div>
+        <div class="ac-meta-i"><div class="ac-meta-l">Glossary</div><div class="ac-meta-v">60+ terms</div></div>
+        <div class="ac-meta-i"><div class="ac-meta-l">Level</div><div class="ac-meta-v">Zero → Fluent</div></div>
+        <div class="ac-meta-i"><div class="ac-meta-l">Full access</div><div class="ac-meta-v" style="color:var(--red)">$10</div></div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- LIFECYCLE ROADMAP -->
+<div class="road wrap">
+  <div class="sec-h rv">
+    <div class="sec-h-l"><span class="sec-h-num">§ 00</span><span class="sec-h-t">The Deal Lifecycle</span></div>
+    <div class="sec-h-r">Where screening fits in the journey</div>
+  </div>
+  <div class="road-strip rv">
+    <div class="road-step"><div class="road-n">01</div><div class="road-t">Origination</div><div class="road-d">Finding and sourcing companies worth approaching.</div></div>
+    <div class="road-step here"><div class="road-n">02</div><div class="road-t">Screening</div><div class="road-d">A fast go / no-go read on whether a deal is worth pursuing — where MergerIQ lives.</div></div>
+    <div class="road-step"><div class="road-n">03</div><div class="road-t">Diligence</div><div class="road-d">Deep investigation of the target's books, contracts, and risks.</div></div>
+    <div class="road-step"><div class="road-n">04</div><div class="road-t">Structuring</div><div class="road-d">Agreeing the price, payment mix, and terms.</div></div>
+    <div class="road-step"><div class="road-n">05</div><div class="road-t">Regulatory</div><div class="road-d">Government review for competition and national-security concerns.</div></div>
+    <div class="road-step"><div class="road-n">06</div><div class="road-t">Close</div><div class="road-d">Signing, funding, and combining the two companies.</div></div>
+  </div>
+</div>
+
+<!-- CURRICULUM -->
+<div class="wrap">
+  <div class="sec-h rv">
+    <div class="sec-h-l"><span class="sec-h-num">§ 01</span><span class="sec-h-t">The Curriculum</span></div>
+    <div class="sec-h-r">Lesson 01 free · 02–07 unlock at $10</div>
+  </div>
+  <div class="toc rv">
+    <a class="toc-i" href="#l1"><span class="toc-n">01</span><span class="toc-t">What is M&amp;A &amp; Why it Happens<span class="mins">6 min read</span></span><span class="toc-lock free">Free</span></a>
+    <a class="toc-i" href="#paywall"><span class="toc-n">02</span><span class="toc-t">Types of Deals<span class="mins">7 min read</span></span><span class="toc-lock locked">🔒 Locked</span></a>
+    <a class="toc-i" href="#paywall"><span class="toc-n">03</span><span class="toc-t">How a Deal is Structured<span class="mins">8 min read</span></span><span class="toc-lock locked">🔒 Locked</span></a>
+    <a class="toc-i" href="#paywall"><span class="toc-n">04</span><span class="toc-t">The Role of Advisors<span class="mins">6 min read</span></span><span class="toc-lock locked">🔒 Locked</span></a>
+    <a class="toc-i" href="#paywall"><span class="toc-n">05</span><span class="toc-t">The Regulatory Process<span class="mins">7 min read</span></span><span class="toc-lock locked">🔒 Locked</span></a>
+    <a class="toc-i" href="#paywall"><span class="toc-n">06</span><span class="toc-t">Why Deals Fail<span class="mins">7 min read</span></span><span class="toc-lock locked">🔒 Locked</span></a>
+    <a class="toc-i" href="#paywall"><span class="toc-n">07</span><span class="toc-t">How to Read a Deal<span class="mins">7 min read</span></span><span class="toc-lock locked">🔒 Locked</span></a>
+  </div>
+</div>
+
+<!-- LESSON 01 — FREE -->
+<div class="wrap" id="l1">
+  <div class="lesson">
+    <div class="lesson-tag"><span>Lesson 01</span><span style="color:var(--ink5)">·</span><span class="free">Free preview</span></div>
+    <div class="lesson-grid">
+      <h2 class="lesson-h"><span class="ln">01</span>What is M&amp;A &amp; Why it Happens</h2>
+      <div class="lesson-body">
+        <p><b>Mergers and acquisitions</b> — almost always shortened to <em>M&amp;A</em> — is the business of one company buying, combining with, or absorbing another. A <span class="keyterm">merger</span> is when two companies agree to join and move forward as one. An <span class="keyterm">acquisition</span> is when one company (the <b>buyer</b> or <b>acquirer</b>) purchases another (the <b>target</b>) outright. In practice the words blur together, and most "mergers" you read about are really one company buying the other.</p>
+        <p>The core question behind every deal is simple: <em>is the combined company worth more than the two companies apart?</em> When the answer is yes, there's a reason to do the deal. That extra value has a name — <span class="keyterm">synergy</span> — and it's the story every acquirer tells to justify the price.</p>
+        <h4>Why companies do it</h4>
+        <p>Deals happen for a handful of recurring reasons. A buyer might want to <b>grow faster</b> than it could on its own — buying a competitor adds revenue overnight. It might want a <b>new capability</b>: a technology, a product, a team, or a patent it would take years to build. It might be chasing <b>scale</b> — bigger companies can cut costs by combining overlapping departments. Or it might be <b>defensive</b>: buying a rising threat before it becomes dangerous, or before a rival buys it first.</p>
+        <p class="pullquote">Every deal is a bet that two things together are worth more than the sum of their parts.</p>
+        <p>Sellers have their own reasons. Founders may want an <b>exit</b> — a way to turn years of work into cash. A company under pressure might sell because it can't compete alone. Sometimes the best outcome for shareholders is simply to be bought at a premium.</p>
+        <h4>What "premium" means</h4>
+        <p>When a buyer acquires a public company, it almost always pays more than the current market price. That extra amount is the <span class="keyterm">premium</span> — the bonus needed to convince shareholders to sell. A 30–50% premium is typical. Too small, and shareholders say no. Too large, and the buyer risks overpaying, which is exactly the kind of risk MergerIQ is built to flag.</p>
+        <p>Understanding <em>why</em> a deal is happening is the first step to judging whether it will work. A deal driven by a clear strategic logic and a sensible price tends to close. A deal driven by ego, fear, or a wildly high price tends to run into trouble — with boards, with shareholders, and with regulators. The rest of this course walks through exactly how that plays out.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- GLOSSARY -->
+<div class="wrap" id="glossary">
+  <div class="sec-h rv">
+    <div class="sec-h-l"><span class="sec-h-num">§ 02</span><span class="sec-h-t">The Glossary</span></div>
+    <div class="sec-h-r">Plain-English M&amp;A dictionary · 19 of 60+ shown</div>
+  </div>
+  <div class="gloss-tools rv">
+    <div class="gloss-search">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="#0C0B09" stroke-width="1.3"/><path d="M9.5 9.5l3 3" stroke="#0C0B09" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <input id="glossSearch" placeholder="Search terms…" autocomplete="off"/>
+    </div>
+    <div class="gloss-cats" id="glossCats">
+      <button class="gcat active" data-cat="all">All</button>
+      <button class="gcat" data-cat="Basics">Basics</button>
+      <button class="gcat" data-cat="Valuation">Valuation</button>
+      <button class="gcat" data-cat="Process">Process</button>
+      <button class="gcat" data-cat="Regulatory">Regulatory</button>
+      <button class="gcat" data-cat="Structure">Structure</button>
+    </div>
+  </div>
+  <div class="gloss-grid" id="glossGrid">
+    <div class="gterm" data-cat="Basics"><div class="gterm-top"><div class="gterm-t">Acquirer</div><div class="gterm-tag">Basics</div></div><div class="gterm-d">The company doing the buying. Also called the <b>buyer</b>.</div></div>
+    <div class="gterm" data-cat="Basics"><div class="gterm-top"><div class="gterm-t">Target</div><div class="gterm-tag">Basics</div></div><div class="gterm-d">The company being bought.</div></div>
+    <div class="gterm" data-cat="Basics"><div class="gterm-top"><div class="gterm-t">Synergy</div><div class="gterm-tag">Basics</div></div><div class="gterm-d">The extra value created by combining two companies — the main reason most deals happen.</div></div>
+    <div class="gterm" data-cat="Basics"><div class="gterm-top"><div class="gterm-t">Accretive</div><div class="gterm-tag">Basics</div></div><div class="gterm-d">A deal that <b>raises</b> the buyer's earnings per share. The opposite is dilutive.</div></div>
+    <div class="gterm" data-cat="Basics"><div class="gterm-top"><div class="gterm-t">Hostile Takeover</div><div class="gterm-tag">Basics</div></div><div class="gterm-d">Buying a company against the wishes of its board.</div></div>
+    <div class="gterm" data-cat="Valuation"><div class="gterm-top"><div class="gterm-t">Premium</div><div class="gterm-tag">Valuation</div></div><div class="gterm-d">The extra amount paid above a company's current market price to win over shareholders.</div></div>
+    <div class="gterm" data-cat="Valuation"><div class="gterm-top"><div class="gterm-t">Multiple</div><div class="gterm-tag">Valuation</div></div><div class="gterm-d">How many times a financial figure — sales or profit — the buyer is paying.</div></div>
+    <div class="gterm" data-cat="Valuation"><div class="gterm-top"><div class="gterm-t">EBITDA</div><div class="gterm-tag">Valuation</div></div><div class="gterm-d">A company's core operating profit, before interest, taxes, and accounting adjustments.</div></div>
+    <div class="gterm" data-cat="Valuation"><div class="gterm-top"><div class="gterm-t">Enterprise Value</div><div class="gterm-tag">Valuation</div></div><div class="gterm-d">The full price to buy a company, including the debt that comes with it. Shortened to <b>EV</b>.</div></div>
+    <div class="gterm" data-cat="Valuation"><div class="gterm-top"><div class="gterm-t">IRR</div><div class="gterm-tag">Valuation</div></div><div class="gterm-d">Internal Rate of Return — the yearly return on the money invested in a deal.</div></div>
+    <div class="gterm" data-cat="Process"><div class="gterm-top"><div class="gterm-t">Due Diligence</div><div class="gterm-tag">Process</div></div><div class="gterm-d">The deep investigation a buyer runs on a target before committing to the deal.</div></div>
+    <div class="gterm" data-cat="Process"><div class="gterm-top"><div class="gterm-t">Letter of Intent</div><div class="gterm-tag">Process</div></div><div class="gterm-d">A non-binding outline of the proposed terms, signed early to show serious intent. Shortened to <b>LOI</b>.</div></div>
+    <div class="gterm" data-cat="Process"><div class="gterm-top"><div class="gterm-t">Escrow</div><div class="gterm-tag">Process</div></div><div class="gterm-d">Money held by a neutral third party until agreed deal conditions are met.</div></div>
+    <div class="gterm" data-cat="Regulatory"><div class="gterm-top"><div class="gterm-t">Antitrust</div><div class="gterm-tag">Regulatory</div></div><div class="gterm-d">Laws that block deals which would reduce competition or create a monopoly.</div></div>
+    <div class="gterm" data-cat="Regulatory"><div class="gterm-top"><div class="gterm-t">Second Request</div><div class="gterm-tag">Regulatory</div></div><div class="gterm-d">A regulator's demand for more information — a clear sign of deeper scrutiny.</div></div>
+    <div class="gterm" data-cat="Regulatory"><div class="gterm-top"><div class="gterm-t">Break Fee</div><div class="gterm-tag">Regulatory</div></div><div class="gterm-d">A penalty one side pays if it walks away from a signed deal.</div></div>
+    <div class="gterm" data-cat="Structure"><div class="gterm-top"><div class="gterm-t">Earnout</div><div class="gterm-tag">Structure</div></div><div class="gterm-d">Part of the price paid later, only if the company hits agreed performance targets.</div></div>
+    <div class="gterm" data-cat="Structure"><div class="gterm-top"><div class="gterm-t">Horizontal Merger</div><div class="gterm-tag">Structure</div></div><div class="gterm-d">A deal between two direct competitors in the same market.</div></div>
+    <div class="gterm" data-cat="Structure"><div class="gterm-top"><div class="gterm-t">Vertical Merger</div><div class="gterm-tag">Structure</div></div><div class="gterm-d">A deal between a company and its supplier or distributor.</div></div>
+    <div class="gloss-empty" id="glossEmpty" style="display:none">No terms match that search.</div>
+  </div>
+  <div class="gloss-more">Full A–Z glossary — 60+ terms with worked examples — unlocks with the course&nbsp; · &nbsp;<a href="#paywall">Unlock for $10 →</a></div>
+</div>
+
+<!-- SECTOR CHEAT SHEET -->
+<div class="wrap">
+  <div class="sec-h rv">
+    <div class="sec-h-l"><span class="sec-h-num">§ 03</span><span class="sec-h-t">Sector Cheat Sheet</span></div>
+    <div class="sec-h-r">Typical valuation ranges by industry</div>
+  </div>
+  <p class="lesson-body rv" style="font-size:14px;margin:20px 0 18px;max-width:72ch">Every sector trades in a different range. The same multiple that's normal for software would be wildly high for hardware. Use this as a gut-check — if a deal sits well past the "aggressive" column, ask why.</p>
+  <div class="cheat rv">
+    <table>
+      <thead><tr><th>Sector</th><th class="r">Typical Price / Revenue</th><th class="r">Typical Price / Profit</th><th class="r">Considered aggressive</th></tr></thead>
+      <tbody>
+        <tr><td class="s">SaaS / Software</td><td class="m r">10–20×</td><td class="m r">25–40×</td><td class="m r hot">&gt; 20× rev</td></tr>
+        <tr><td class="s">Hardware</td><td class="m r">1–3×</td><td class="m r">8–14×</td><td class="m r hot">&gt; 5× rev</td></tr>
+        <tr><td class="s">Fintech</td><td class="m r">6–12×</td><td class="m r">18–30×</td><td class="m r hot">&gt; 15× rev</td></tr>
+        <tr><td class="s">Healthcare</td><td class="m r">3–6×</td><td class="m r">12–20×</td><td class="m r hot">&gt; 8× rev</td></tr>
+        <tr><td class="s">Pharma / Biotech</td><td class="m r">4–8×</td><td class="m r">14–22×</td><td class="m r hot">&gt; 10× rev</td></tr>
+        <tr><td class="s">Consumer</td><td class="m r">1–3×</td><td class="m r">8–12×</td><td class="m r hot">&gt; 4× rev</td></tr>
+        <tr><td class="s">Media / Telecom</td><td class="m r">2–4×</td><td class="m r">6–10×</td><td class="m r hot">&gt; 6× rev</td></tr>
+        <tr><td class="s">Defense / Aerospace</td><td class="m r">2–4×</td><td class="m r">10–16×</td><td class="m r hot">&gt; 6× rev</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="gloss-more" style="margin-top:0">Six more sector sheets + deal-screening checklist included&nbsp; · &nbsp;<a href="#paywall">Unlock for $10 →</a></div>
+</div>
+
+<!-- KNOWLEDGE CHECK / QUIZ -->
+<div class="wrap" id="quiz">
+  <div class="sec-h rv">
+    <div class="sec-h-l"><span class="sec-h-num">§ 04</span><span class="sec-h-t">Knowledge Check</span></div>
+    <div class="sec-h-r">Free sample · 4 questions from Lesson 01</div>
+  </div>
+  <div class="quiz rv">
+    <div class="quiz-bar">
+      <span class="quiz-bar-l">M&amp;A Fundamentals · Quiz</span>
+      <div class="quiz-prog">
+        <span class="quiz-prog-n" id="qProgN">1 / 4</span>
+        <div class="quiz-prog-track"><div class="quiz-prog-fill" id="qProgFill"></div></div>
+      </div>
+    </div>
+    <div class="quiz-body" id="qBody">
+      <div class="quiz-qn" id="qNum">Question 01</div>
+      <div class="quiz-q" id="qText">—</div>
+      <div class="quiz-opts" id="qOpts"></div>
+      <div class="quiz-fb" id="qFb"></div>
+    </div>
+    <div class="quiz-foot" id="qFoot">
+      <span class="quiz-score">Score <b id="qScore">0</b> / 4</span>
+      <button class="quiz-next" id="qNext"><span>Next</span><span class="arr">→</span></button>
+    </div>
+    <div class="quiz-result" id="qResult">
+      <div class="quiz-result-l">Quiz complete</div>
+      <div class="quiz-result-score" id="qResultScore">4 / 4</div>
+      <div class="quiz-result-msg" id="qResultMsg">Perfect — you've got the fundamentals down.</div>
+      <button class="quiz-retry" id="qRetry">↻ Try again</button>
+    </div>
+  </div>
+</div>
+
+<!-- CERTIFICATE -->
+<div class="wrap" id="certificate">
+  <div class="sec-h rv">
+    <div class="sec-h-l"><span class="sec-h-num">§ 05</span><span class="sec-h-t">Your Certificate</span></div>
+    <div class="sec-h-r">Earned on completing the full course</div>
+  </div>
+  <div class="cert-intro rv">
+    <div>
+      <div class="cert-intro-h">Finish the course, earn your certificate.</div>
+      <div class="cert-intro-p">Complete all seven lessons and the final assessment to earn a MergerIQ Academy certificate — a shareable credential for your LinkedIn and résumé. Preview yours below.</div>
+      <div class="cert-form">
+        <input id="certName" placeholder="Enter your name" autocomplete="off"/>
+        <button id="certGen">Preview Certificate</button>
+      </div>
+    </div>
+    <svg class="cert-seal" viewBox="0 0 96 96" fill="none">
+      <circle cx="48" cy="48" r="44" stroke="#DCD8CB" stroke-width="1"/>
+      <circle cx="48" cy="48" r="38" stroke="#0C0B09" stroke-width="1"/>
+      <g id="sealText"></g>
+      <line x1="32" y1="62" x2="64" y2="62" stroke="#0C0B09" stroke-width="1.1"/>
+      <line x1="38" y1="30" x2="48" y2="62" stroke="#0C0B09" stroke-width="1.4" stroke-linecap="round"/>
+      <line x1="58" y1="30" x2="48" y2="62" stroke="#0C0B09" stroke-width="1.4" stroke-linecap="round"/>
+      <circle cx="48" cy="62" r="2.4" fill="#0C0B09"/>
+      <line x1="56" y1="55" x2="56" y2="69" stroke="#8B1A0E" stroke-width="1.2" stroke-linecap="round" stroke-dasharray="1.3 1.5"/>
+    </svg>
+  </div>
+
+  <!-- certificate artifact -->
+  <div class="cert" id="cert">
+    <div class="cert-inner">
+      <span class="cert-corner tl"></span><span class="cert-corner tr"></span>
+      <span class="cert-corner bl"></span><span class="cert-corner br"></span>
+      <div class="cert-c">
+        <div class="cert-mk">
+          <svg viewBox="0 0 36 36">
+            <line x1="2" y1="28" x2="34" y2="28" stroke="#0C0B09" stroke-width="1.3"/>
+            <line x1="6" y1="6" x2="18" y2="28" stroke="#0C0B09" stroke-width="1.7" stroke-linecap="round"/>
+            <line x1="30" y1="6" x2="18" y2="28" stroke="#0C0B09" stroke-width="1.7" stroke-linecap="round"/>
+            <circle cx="18" cy="28" r="2.6" fill="#0C0B09"/>
+            <line x1="26" y1="22" x2="26" y2="33" stroke="#8B1A0E" stroke-width="1.4" stroke-linecap="round" stroke-dasharray="1.4 1.6"/>
+          </svg>
+          <span><b>Merger</b>IQ Academy</span>
+        </div>
+        <div class="cert-l">Certificate of Completion</div>
+        <div class="cert-name" id="certNameOut">Your Name</div>
+        <div class="cert-desc">has successfully completed <b>M&amp;A 101: The Deal Lifecycle</b> — demonstrating a working command of how mergers and acquisitions are screened, structured, and closed.</div>
+        <div class="cert-meta">
+          <div class="cert-meta-i"><div class="cert-meta-l">Issued</div><div class="cert-meta-v" id="certDate">—</div></div>
+          <div class="cert-meta-i"><div class="cert-meta-l">Credential ID</div><div class="cert-meta-v" id="certId">—</div></div>
+          <div class="cert-meta-i"><div class="cert-meta-l">Issued by</div><div class="cert-meta-v">MergerIQ</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="cert-actions" id="certActions" style="display:none">
+    <button id="certPrint"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M3 4.5V1.5h6v3M3 9H1.5V4.5h9V9H9M3 7.5h6V11H3z" stroke="currentColor" stroke-width="1" stroke-linejoin="round"/></svg>Save as PDF</button>
+    <button id="certLinkedIn"><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M1 4.5h2V11H1zM2 1a1 1 0 100 2 1 1 0 000-2zM5 4.5h2v1c.4-.6 1.2-1.2 2.2-1.2C10.8 4.3 11 5.6 11 7v4H9V7.4c0-.7-.3-1.2-1-1.2s-1 .5-1 1.2V11H5z" fill="currentColor"/></svg>Share on LinkedIn</button>
+  </div>
+</div>
+
+<!-- PAYWALL -->
+<div class="wrap" id="paywall">
+  <div class="sec-h rv">
+    <div class="sec-h-l"><span class="sec-h-num">§ 06</span><span class="sec-h-t">Full Access</span></div>
+    <div class="sec-h-r">Everything below unlocks once · $10</div>
+  </div>
+  <div class="paywall rv" style="margin-top:8px">
+    <!-- locked teaser -->
+    <div class="pw-locked">
+      <div class="lesson" style="border:none">
+        <div class="lesson-tag"><span>Lesson 02</span><span style="color:var(--ink5)">·</span><span>Types of Deals</span></div>
+        <div class="lesson-grid">
+          <h2 class="lesson-h"><span class="ln">02</span>Types of Deals</h2>
+          <div class="lesson-body">
+            <p>Not all deals look the same. The shape of a transaction tells you a lot about why it's happening and how regulators will react. A <b>horizontal</b> deal joins two direct competitors — same industry, same stage. A <b>vertical</b> deal joins a company with its supplier or distributor. A <b>conglomerate</b> deal combines unrelated businesses entirely…</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- gate -->
+    <div class="pw-gate">
+      <div class="pw-l">
+        <div class="pw-eyebrow"><span class="lk">🔒</span><span>The complete M&amp;A bundle</span></div>
+        <div class="pw-h">One coffee. The whole <b>playbook.</b></div>
+        <div class="pw-list">
+          <div class="pw-li"><span class="ck">✓</span><span><b>6 more lessons</b> — deal types, structuring, advisors, regulators, why deals fail &amp; how to read one</span></div>
+          <div class="pw-li"><span class="ck">✓</span><span><b>Full A–Z glossary</b> — 60+ terms with worked examples</span></div>
+          <div class="pw-li"><span class="ck">✓</span><span><b>All 8 sector cheat sheets</b> — valuation ranges &amp; red flags</span></div>
+          <div class="pw-li"><span class="ck">✓</span><span><b>The deal-screening checklist</b> — the questions analysts actually ask</span></div>
+          <div class="pw-li"><span class="ck">✓</span><span><b>End-of-lesson quizzes</b> — check you've really got it</span></div>
+          <div class="pw-li"><span class="ck">✓</span><span><b>Certificate of completion</b> — shareable on LinkedIn</span></div>
+          <div class="pw-li"><span class="ck">✓</span><span><b>Lifetime updates</b> — new lessons added as the field moves</span></div>
+        </div>
+      </div>
+      <div class="pw-r">
+        <div class="pw-price"><span class="cur">$</span>10</div>
+        <div class="pw-price-sub">One-time · lifetime access</div>
+        <button class="pw-btn" id="unlockBtn"><span>Unlock the Academy</span><span class="arr">→</span></button>
+        <div class="pw-note">Secure checkout · 7-day refund</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="foot">
+  <span>© 2026 MergerIQ · Proprietary &amp; confidential · Patent pending</span>
+  <span>Built by Riya Pradhan · Georgetown McDonough MSBA '26</span>
+  <span><a href="index.html">← Back home</a></span>
+</div>
+
+<script>
+const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}})},{threshold:0.12});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+document.getElementById('unlockBtn')?.addEventListener('click',()=>{
+  alert('Checkout coming soon — the Academy unlocks at $10 for lifetime access.');
+});
+
+/* Glossary search + category filter */
+(function(){
+  const search=document.getElementById('glossSearch');
+  const cats=document.getElementById('glossCats');
+  const grid=document.getElementById('glossGrid');
+  const empty=document.getElementById('glossEmpty');
+  if(!grid) return;
+  const terms=[...grid.querySelectorAll('.gterm')];
+  let activeCat='all';
+  function apply(){
+    const q=(search.value||'').trim().toLowerCase();
+    let shown=0;
+    terms.forEach(t=>{
+      const txt=t.textContent.toLowerCase();
+      const cat=t.dataset.cat;
+      const matchCat=activeCat==='all'||cat===activeCat;
+      const matchQ=!q||txt.includes(q);
+      const on=matchCat&&matchQ;
+      t.style.display=on?'':'none';
+      if(on) shown++;
+    });
+    empty.style.display=shown?'none':'';
+  }
+  search.addEventListener('input',apply);
+  cats.querySelectorAll('.gcat').forEach(b=>{
+    b.addEventListener('click',()=>{
+      cats.querySelectorAll('.gcat').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      activeCat=b.dataset.cat;
+      apply();
+    });
+  });
+})();
+
+/* ── QUIZ ENGINE ── */
+(function(){
+  const QS=[
+    {q:'What does the term “synergy” describe in an M&A deal?',
+     opts:['The legal paperwork required to close','The extra value created by combining two companies','The premium paid above market price','The fee paid to investment bankers'],
+     a:1,
+     fb:'Synergy is the extra value created by combining two companies — the core reason most deals are justified.'},
+    {q:'A buyer pays more than a company’s current market price. That extra amount is called the…',
+     opts:['Multiple','Earnout','Premium','Break fee'],
+     a:2,
+     fb:'The premium is the bonus over market price needed to convince shareholders to sell — typically 30–50%.'},
+    {q:'Which of these is the clearest sign a buyer may be overpaying?',
+     opts:['A revenue multiple far above the sector norm','Paying in cash instead of stock','A target with healthy profit margins','A calm, low-volatility market'],
+     a:0,
+     fb:'A revenue multiple well above the sector benchmark is the classic overvaluation flag — exactly what MergerIQ screens for.'},
+    {q:'In which stage of the deal lifecycle does MergerIQ primarily operate?',
+     opts:['Closing','Due diligence','Screening','Regulatory review'],
+     a:2,
+     fb:'MergerIQ lives at the screening stage — the fast go / no-go read before deeper diligence begins.'},
+  ];
+  const elNum=document.getElementById('qNum'),elText=document.getElementById('qText'),
+        elOpts=document.getElementById('qOpts'),elFb=document.getElementById('qFb'),
+        elNext=document.getElementById('qNext'),elScore=document.getElementById('qScore'),
+        elProgN=document.getElementById('qProgN'),elProgFill=document.getElementById('qProgFill'),
+        elBody=document.getElementById('qBody'),elFoot=document.getElementById('qFoot'),
+        elResult=document.getElementById('qResult'),elRScore=document.getElementById('qResultScore'),
+        elRMsg=document.getElementById('qResultMsg'),elRetry=document.getElementById('qRetry');
+  if(!elText) return;
+  let i=0,score=0,answered=false;
+  const keys=['A','B','C','D'];
+  function render(){
+    answered=false;
+    const item=QS[i];
+    elNum.textContent='Question '+String(i+1).padStart(2,'0');
+    elText.textContent=item.q;
+    elProgN.textContent=(i+1)+' / '+QS.length;
+    elProgFill.style.width=((i)/QS.length*100)+'%';
+    elFb.className='quiz-fb';elFb.textContent='';
+    elNext.classList.remove('ready');
+    elNext.querySelector('span').textContent=(i===QS.length-1)?'See result':'Next';
+    elOpts.innerHTML='';
+    item.opts.forEach((o,idx)=>{
+      const b=document.createElement('button');
+      b.className='quiz-opt';
+      b.innerHTML='<span class="key">'+keys[idx]+'</span><span>'+o+'</span>';
+      b.addEventListener('click',()=>choose(idx,b));
+      elOpts.appendChild(b);
+    });
+  }
+  function choose(idx,btn){
+    if(answered) return;
+    answered=true;
+    const item=QS[i];
+    const all=[...elOpts.children];
+    all.forEach((b,bi)=>{
+      b.disabled=true;
+      if(bi===item.a) b.classList.add('correct');
+    });
+    if(idx===item.a){score++;elScore.textContent=score;elFb.className='quiz-fb show ok';elFb.innerHTML='<b>Correct.</b> '+item.fb;}
+    else{btn.classList.add('wrong');elFb.className='quiz-fb show no';elFb.innerHTML='<b>Not quite.</b> '+item.fb;}
+    elNext.classList.add('ready');
+  }
+  elNext.addEventListener('click',()=>{
+    if(!answered) return;
+    if(i<QS.length-1){i++;render();}
+    else{
+      elProgFill.style.width='100%';
+      elBody.style.display='none';elFoot.style.display='none';
+      const perfect=score===QS.length;
+      elRScore.textContent=score+' / '+QS.length;
+      elRScore.className='quiz-result-score'+(score<=2?' low':'');
+      elRMsg.textContent = perfect?'Perfect — you’ve got the fundamentals down.'
+        : score===3?'Strong — one to review and you’re there.'
+        : score===2?'A solid start — revisit Lesson 01 and try again.'
+        : 'Worth another pass through Lesson 01 — then come back.';
+      elResult.classList.add('show');
+    }
+  });
+  elRetry.addEventListener('click',()=>{
+    i=0;score=0;elScore.textContent='0';
+    elResult.classList.remove('show');
+    elBody.style.display='';elFoot.style.display='';
+    render();
+  });
+  render();
+})();
+
+/* ── CERTIFICATE ── */
+(function(){
+  const name=document.getElementById('certName'),gen=document.getElementById('certGen'),
+        cert=document.getElementById('cert'),out=document.getElementById('certNameOut'),
+        date=document.getElementById('certDate'),id=document.getElementById('certId'),
+        actions=document.getElementById('certActions'),
+        prnt=document.getElementById('certPrint'),li=document.getElementById('certLinkedIn');
+  // seal text along arc
+  const seal=document.getElementById('sealText');
+  if(seal){
+    const txt='· MERGERIQ ACADEMY · CERTIFIED ·';
+    const R=33,cx=48,cy=48;
+    [...txt].forEach((ch,k)=>{
+      const ang=(k/txt.length)*2*Math.PI - Math.PI/2;
+      const x=cx+R*Math.cos(ang), y=cy+R*Math.sin(ang);
+      const t=document.createElementNS('http://www.w3.org/2000/svg','text');
+      t.setAttribute('x',x);t.setAttribute('y',y);
+      t.setAttribute('text-anchor','middle');
+      t.setAttribute('font-family','JetBrains Mono');
+      t.setAttribute('font-size','4.4');
+      t.setAttribute('fill','#6B6A60');
+      t.setAttribute('transform','rotate('+(ang*180/Math.PI+90)+' '+x+' '+y+')');
+      t.textContent=ch;
+      seal.appendChild(t);
+    });
+  }
+  if(!gen) return;
+  function build(){
+    const n=(name.value||'').trim();
+    if(!n){name.focus();return;}
+    out.textContent=n;
+    const d=new Date();
+    date.textContent=d.toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+    id.textContent='MIQ-'+d.getFullYear()+'-'+Math.random().toString(36).slice(2,7).toUpperCase();
+    cert.classList.add('show');
+    actions.style.display='flex';
+  }
+  gen.addEventListener('click',build);
+  name.addEventListener('keydown',e=>{if(e.key==='Enter')build();});
+  prnt&&prnt.addEventListener('click',()=>window.print());
+  li&&li.addEventListener('click',()=>{
+    const url='https://www.linkedin.com/sharing/share-offsite/?url='+encodeURIComponent('https://mergeriq.app/academy');
+    window.open(url,'_blank','noopener');
+  });
+})();
+</script>
+</body>
+</html>
