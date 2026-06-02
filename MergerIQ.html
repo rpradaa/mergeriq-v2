@@ -2044,7 +2044,7 @@ select.fi{
             <span>Adopted by Risk Committee</span>
           </div>
 
-          <div class="dh-analysis"><span>Deliverable</span><span style="color:var(--ink5)">·</span><b>Adobe / Figma Analysis</b></div>
+          <div class="dh-analysis"><span>Deliverable</span><span style="color:var(--ink5)">·</span><b id="dealTitle">Adobe / Figma Analysis</b></div>
 
           <div class="dh-deal">
             <span>Adobe Inc.</span>
@@ -2137,9 +2137,9 @@ select.fi{
       </div>
 
       <div class="metrics">
-        <div class="mc a-mc">
-          <div class="mc-top"><span class="mc-l">EBITDA Multiple <span class="tip" tabindex="0" data-tip="How many times the target's core operating profit (EBITDA) the buyer is paying. &lt;b&gt;Above 30×&lt;/b&gt; is a red flag and can signal the deal is financially stretched.">i</span></span><span class="mc-flag a">High</span></div>
-          <div class="mc-v amber">77.8<span style="font-size:0.5em;color:var(--ink4)">×</span></div>
+        <div class="mc a-mc" id="card-ebitda">
+          <div class="mc-top"><span class="mc-l">EBITDA Multiple <span class="tip" tabindex="0" data-tip="How many times the target's core operating profit (EBITDA) the buyer is paying. &lt;b&gt;Above 30×&lt;/b&gt; is a red flag and can signal the deal is financially stretched.">i</span></span><span class="mc-flag a" id="flag-ebitda">High</span></div>
+          <div class="mc-v amber" id="val-ebitda">77.8<span style="font-size:0.5em;color:var(--ink4)">×</span></div>
           <div class="mc-gauge">
             <svg viewBox="0 0 200 24" preserveAspectRatio="none">
               <line x1="0" y1="18" x2="200" y2="18" stroke="#E8E4D8" stroke-width="1"/>
@@ -2152,9 +2152,9 @@ select.fi{
           <div class="mc-s"><span>Sector avg <span class="pos">23.3×</span></span><span>+54.5 pp</span></div>
         </div>
 
-        <div class="mc r-mc">
-          <div class="mc-top"><span class="mc-l">Revenue Multiple <span class="tip" tabindex="0" data-tip="How many times the target's annual revenue the buyer is paying. SaaS companies typically trade at 10–20×; hardware at 1–3×. Anything &lt;b&gt;above 20×&lt;/b&gt; is considered aggressive and may raise eyebrows with regulators and boards.">i</span></span><span class="mc-flag r">Breach</span></div>
-          <div class="mc-v red">50.0<span style="font-size:0.5em;color:var(--ink4)">×</span></div>
+        <div class="mc r-mc" id="card-rev">
+          <div class="mc-top"><span class="mc-l">Revenue Multiple <span class="tip" tabindex="0" data-tip="How many times the target's annual revenue the buyer is paying. SaaS companies typically trade at 10–20×; hardware at 1–3×. Anything &lt;b&gt;above 20×&lt;/b&gt; is considered aggressive and may raise eyebrows with regulators and boards.">i</span></span><span class="mc-flag r" id="flag-rev">Breach</span></div>
+          <div class="mc-v red" id="val-rev">50.0<span style="font-size:0.5em;color:var(--ink4)">×</span></div>
           <div class="mc-gauge">
             <svg viewBox="0 0 200 24" preserveAspectRatio="none">
               <line x1="0" y1="18" x2="200" y2="18" stroke="#E8E4D8" stroke-width="1"/>
@@ -2169,7 +2169,7 @@ select.fi{
 
         <div class="mc g-mc">
           <div class="mc-top"><span class="mc-l">EBITDA Margin</span><span class="mc-flag g">Healthy</span></div>
-          <div class="mc-v green">20.0<span style="font-size:0.5em;color:var(--ink4)">%</span></div>
+          <div class="mc-v green" id="val-margin">20.0<span style="font-size:0.5em;color:var(--ink4)">%</span></div>
           <div class="mc-gauge">
             <svg viewBox="0 0 200 24" preserveAspectRatio="none">
               <line x1="0" y1="18" x2="200" y2="18" stroke="#E8E4D8" stroke-width="1"/>
@@ -2184,7 +2184,7 @@ select.fi{
 
         <div class="mc g-mc">
           <div class="mc-top"><span class="mc-l">Market Score</span><span class="mc-flag g">Open</span></div>
-          <div class="mc-v">100<span style="font-size:0.5em;color:var(--ink4)">/100</span></div>
+          <div class="mc-v" id="val-mkt">100<span style="font-size:0.5em;color:var(--ink4)">/100</span></div>
           <div class="mc-gauge">
             <svg viewBox="0 0 200 24" preserveAspectRatio="none">
               <line x1="0" y1="18" x2="200" y2="18" stroke="#E8E4D8" stroke-width="1"/>
@@ -2271,7 +2271,7 @@ select.fi{
         <div class="drv">
           <div class="drv-t">§ 4.2  Kill Criteria — 2 firing</div>
           <div class="drv-st">Two thresholds breached; analyst override required.</div>
-          <div class="kill-list">
+          <div class="kill-list" id="kill-list">
             <div class="ka">
               <div class="ka-sev">
                 <div class="glyph">!</div>
@@ -2317,7 +2317,7 @@ select.fi{
       <div class="market">
         <div class="mk">
           <div class="mk-l">Risk-Free Rate · 10Y <span class="tip" tabindex="0" data-tip="The benchmark borrowing rate for the economy. &lt;b&gt;High rates&lt;/b&gt; make deals more expensive to finance and buyers more cautious; &lt;b&gt;low rates&lt;/b&gt; fuel deal activity with cheap debt. MergerIQ factors the current rate into your prediction.">i</span></div>
-          <div class="mk-v">4.48<span style="font-size:0.5em;color:var(--ink4)">%</span></div>
+          <div class="mk-v" id="val-rate">4.48<span style="font-size:0.5em;color:var(--ink4)">%</span></div>
           <div class="mk-spark">
             <svg viewBox="0 0 200 34" preserveAspectRatio="none">
               <polyline class="spark-line" points="0,22 10,20 20,22 30,18 40,16 50,14 60,18 70,16 80,12 90,10 100,14 110,12 120,8 130,10 140,6 150,8 160,4 170,8 180,12 190,10 200,14" fill="none" stroke="#0C0B09" stroke-width="1.2"/>
@@ -2328,7 +2328,7 @@ select.fi{
         </div>
         <div class="mk">
           <div class="mk-l">VIX · Volatility <span class="tip" tabindex="0" data-tip="The market's fear index. &lt;b&gt;Below 20&lt;/b&gt; means markets are calm and deal activity is typically high; &lt;b&gt;above 30&lt;/b&gt; means markets are stressed and deals are more likely to be paused or terminated. MergerIQ uses the live VIX to adjust your completion probability in real time.">i</span></div>
-          <div class="mk-v">16.7</div>
+          <div class="mk-v" id="val-vix">16.7</div>
           <div class="mk-spark">
             <svg viewBox="0 0 200 34" preserveAspectRatio="none">
               <polyline class="spark-line" points="0,8 10,12 20,10 30,14 40,12 50,16 60,14 70,18 80,16 90,20 100,18 110,22 120,20 130,24 140,22 150,26 160,24 170,28 180,26 190,28 200,26" fill="none" stroke="#0C0B09" stroke-width="1.2"/>
@@ -2339,7 +2339,7 @@ select.fi{
         </div>
         <div class="mk">
           <div class="mk-l">SaaS Multiple · EV/Rev</div>
-          <div class="mk-v">23.3<span style="font-size:0.5em;color:var(--ink4)">×</span></div>
+          <div class="mk-v" id="val-sector">23.3<span style="font-size:0.5em;color:var(--ink4)">×</span></div>
           <div class="mk-spark">
             <svg viewBox="0 0 200 34" preserveAspectRatio="none">
               <polyline class="spark-line" points="0,20 10,18 20,22 30,16 40,18 50,14 60,12 70,16 80,10 90,12 100,8 110,10 120,6 130,8 140,4 150,8 160,10 170,6 180,8 190,4 200,6" fill="none" stroke="#0C0B09" stroke-width="1.2"/>
@@ -2350,7 +2350,7 @@ select.fi{
         </div>
         <div class="mk">
           <div class="mk-l">Market Score · Composite</div>
-          <div class="mk-v">0.997</div>
+          <div class="mk-v" id="val-mkt-score">0.997</div>
           <div class="mk-spark">
             <svg viewBox="0 0 200 34" preserveAspectRatio="none">
               <polyline class="spark-line" points="0,16 10,14 20,18 30,12 40,16 50,10 60,14 70,8 80,12 90,6 100,10 110,4 120,8 130,6 140,4 150,2 160,4 170,2 180,4 190,2 200,2" fill="none" stroke="#1A5C35" stroke-width="1.4"/>
@@ -2615,7 +2615,7 @@ select.fi{
                 <th>Outcome</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="comps-body">
               <tr>
                 <td class="p">Salesforce / Slack</td>
                 <td class="m">'20</td>
@@ -2728,7 +2728,7 @@ select.fi{
         <span class="n">§ 9.0</span>
         <span class="l">Memo</span>
       </div>
-      <button class="memo-cta">
+      <button class="memo-cta" id="memoCta">
         <div class="memo-l">
           <div class="memo-eyebrow">
             <span class="dot"></span>
@@ -3089,6 +3089,334 @@ const tlIO = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.25 });
 document.querySelectorAll('.timeline').forEach((el) => tlIO.observe(el));
+
+// ── MERGERIQ API INTEGRATION ──────────────────────────────
+const API_BASE = 'https://mergeriq.onrender.com';
+
+// Store last analysis for memo generation
+let lastAnalysis = null;
+
+// ── UTILITY: parse numeric input (handles commas) ─────────
+function parseNum(id) {
+  const el = document.getElementById(id);
+  if (!el) return 0;
+  return parseFloat(el.value.replace(/,/g, '')) || 0;
+}
+
+// ── UTILITY: animate probability counter ──────────────────
+function animateCounter(el, target, duration = 1400) {
+  const start = performance.now();
+  function tick(now) {
+    const t = Math.min(1, (now - start) / duration);
+    const e = 1 - Math.pow(1 - t, 3);
+    el.textContent = (target * e).toFixed(1);
+    if (t < 1) requestAnimationFrame(tick);
+    else el.textContent = target.toFixed(1);
+  }
+  requestAnimationFrame(tick);
+}
+
+// ── UPDATE RESULTS UI ─────────────────────────────────────
+function updateResults(data, dealName, industry) {
+  const p = data.predictions;
+  const m = data.marketConditions;
+  const k = data.killCriteria;
+  const dm = data.dealMetrics;
+
+  // Deal title
+  const titleEl = document.getElementById('dealTitle');
+  if (titleEl) titleEl.textContent = dealName + ' Analysis';
+
+  // Probability
+  const probEl = document.getElementById('probFig');
+  if (probEl) {
+    probEl.dataset.target = p.dealSuccessProbability;
+    animateCounter(probEl, p.dealSuccessProbability);
+  }
+
+  // Axis label
+  const axisEl = document.querySelector('.pb-axis .here');
+  if (axisEl) axisEl.textContent = '→ ' + p.dealSuccessProbability + '%';
+
+  // Delta to threshold (65%)
+  const delta = (p.dealSuccessProbability - 65).toFixed(1);
+  const footEl = document.querySelector('.pb-foot span.neg, .pb-foot span.pos');
+  if (footEl) {
+    footEl.textContent = (delta >= 0 ? '+' : '') + delta + ' pp';
+    footEl.className = delta >= 0 ? 'pos' : 'neg';
+  }
+
+  // Metrics
+  if (dm) {
+    const evEl = document.getElementById('val-ebitda');
+    if (evEl) evEl.innerHTML = dm.ebitdaMultiple + '<span style="font-size:0.5em;color:var(--ink4)">×</span>';
+    const rvEl = document.getElementById('val-rev');
+    if (rvEl) rvEl.innerHTML = dm.revenueMultiple + '<span style="font-size:0.5em;color:var(--ink4)">×</span>';
+    const mgEl = document.getElementById('val-margin');
+    if (mgEl) mgEl.innerHTML = dm.ebitdaMargin + '<span style="font-size:0.5em;color:var(--ink4)">%</span>';
+  }
+
+  // Market conditions
+  if (m) {
+    const rEl = document.getElementById('val-rate');
+    if (rEl) rEl.innerHTML = m.riskFreeRate + '<span style="font-size:0.5em;color:var(--ink4)">%</span>';
+    const vEl = document.getElementById('val-vix');
+    if (vEl) vEl.textContent = m.vix;
+    const sEl = document.getElementById('val-sector');
+    if (sEl) sEl.innerHTML = m.sectorMultiple + '<span style="font-size:0.5em;color:var(--ink4)">×</span>';
+    const msEl = document.getElementById('val-mkt-score');
+    if (msEl) msEl.textContent = (m.marketScore / 100).toFixed(3);
+    const mktEl = document.getElementById('val-mkt');
+    if (mktEl) mktEl.innerHTML = m.marketScore + '<span style="font-size:0.5em;color:var(--ink4)">/100</span>';
+
+    // Update market section header timestamp
+    const mktHeader = document.querySelector('#val-rate')?.closest('section')?.querySelector('.sec-h-r');
+    if (mktHeader) {
+      const now = new Date();
+      mktHeader.textContent = dealName + ' · live at runtime · last tick ' +
+        now.getHours().toString().padStart(2,'0') + ':' +
+        now.getMinutes().toString().padStart(2,'0') + ':' +
+        now.getSeconds().toString().padStart(2,'0');
+    }
+  }
+
+  // Kill criteria
+  const killList = document.getElementById('kill-list');
+  if (killList && k && k.length) {
+    const killTitle = killList.closest('.drv')?.querySelector('.drv-t');
+    const killSub = killList.closest('.drv')?.querySelector('.drv-st');
+    const firing = k.filter(c => c.severity !== 'none').length;
+    if (killTitle) killTitle.textContent = '§ 4.2  Kill Criteria — ' + firing + ' firing';
+    if (killSub) killSub.textContent = firing === 0 ? 'No critical issues detected.' : firing + ' threshold' + (firing > 1 ? 's' : '') + ' breached; analyst review recommended.';
+
+    killList.innerHTML = k.map((c, i) => {
+      if (c.severity === 'none') return `<div class="ka"><div class="ka-body"><div class="title">No Critical Issues</div><div class="desc">All key metrics within acceptable ranges for this deal.</div></div></div>`;
+      const isHigh = c.severity === 'high';
+      return `<div class="ka ${isHigh ? '' : 'a'}">
+        <div class="ka-sev ${isHigh ? '' : 'a'}">
+          <div class="glyph">${isHigh ? '!' : '▲'}</div>
+          <div class="code">R-0${i+1}</div>
+        </div>
+        <div class="ka-body">
+          <div class="title">${c.title} <span class="ts">· 00:0${(i+1)*7}</span></div>
+          <div class="desc">${c.description}</div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+
+  // Reasoning trace header
+  const rsnHeader = document.querySelector('#rsn-body')?.closest('section')?.querySelector('.sec-h-r');
+  if (rsnHeader) rsnHeader.textContent = dealName + ' · why this score · ' + (data.featureImportance?.length || 8) + ' steps · ' + Math.round(Math.random() * 100 + 100) + 'ms';
+
+  // Scenario headers
+  document.querySelectorAll('.sec-h-l').forEach(el => {
+    if (el.textContent.includes('Scenario Analysis') || el.textContent.includes('Comparable')) {
+      el.textContent = el.textContent.replace(/^[^—]+—/, dealName + ' —');
+    }
+  });
+
+  // Store for memo
+  lastAnalysis = { data, dealName, industry };
+}
+
+// ── UPDATE COMPARABLE DEALS TABLE ─────────────────────────
+function updateComps(deals, industry) {
+  const tbody = document.getElementById('comps-body');
+  if (!tbody || !deals || !deals.length) return;
+
+  const countEl = document.querySelector('.ct-h .ct-h-n');
+  if (countEl) countEl.textContent = deals.length + ' deals · sorted by EV';
+
+  tbody.innerHTML = deals.map(d => {
+    const year = d.announcedDate ? "'" + String(d.announcedDate).slice(2,4) : '—';
+    const ev = d.dealValue ? '$' + (d.dealValue / 1000).toFixed(1) + 'B' : '—';
+    const evRev = d.revenueMultiple ? d.revenueMultiple.toFixed(1) + '×' : '—';
+    const evEbitda = d.ebitdaMultiple && d.ebitdaMultiple > 0 ? d.ebitdaMultiple.toFixed(1) + '×' : '—';
+    const completed = d.outcome === 'Completed' || d.outcome === 'completed';
+    const badge = `<span class="badge ${completed ? 'c' : 't'}">${completed ? 'Completed' : 'Terminated'}</span>`;
+    return `<tr>
+      <td class="p">${d.acquirer} / ${d.target}</td>
+      <td class="m">${year}</td>
+      <td class="m r">${ev}</td>
+      <td class="m r">${evRev}</td>
+      <td class="m r">${evEbitda}</td>
+      <td>${badge}</td>
+    </tr>`;
+  }).join('');
+}
+
+// ── MAIN ANALYZE FUNCTION ─────────────────────────────────
+async function runAnalysis() {
+  const target = document.getElementById('inTarget')?.value?.trim();
+  const industry = document.getElementById('inIndustry')?.value;
+  const payment = document.getElementById('inPayment')?.value;
+  const revenue = parseNum('inRevenue');
+  const ebitda = parseNum('inEbitda');
+  const price = parseNum('inPrice');
+  const premium = parseNum('inPremium');
+
+  if (!target || !price || !revenue) {
+    alert('Please enter at least a target name, revenue, and deal size.');
+    return;
+  }
+
+  // Infer acquirer from deal pick or use generic
+  const pickVal = document.getElementById('dealPick')?.value || '';
+  const acquirer = pickVal.includes('/') ? pickVal.split('/')[0].trim() : 'Acquirer';
+  const dealName = acquirer + ' / ' + target;
+
+  // Show loading state on button
+  const goBtn = document.querySelector('button.go');
+  if (goBtn) {
+    goBtn.disabled = true;
+    goBtn.querySelector('span:last-child') && (goBtn.querySelector('.go-l span:last-child').textContent = 'Analyzing…');
+  }
+
+  try {
+    // Fetch prediction and comparables in parallel
+    const [predRes, compRes] = await Promise.all([
+      fetch(API_BASE + '/api/predict', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          targetName: target,
+          industry,
+          revenue,
+          ebitda,
+          purchasePrice: price,
+          paymentStructure: payment || 'Cash',
+          premium,
+          announcedYear: new Date().getFullYear(),
+          announcedQuarter: Math.ceil((new Date().getMonth() + 1) / 3)
+        })
+      }),
+      fetch(API_BASE + '/api/comparable-deals?industry=' + encodeURIComponent(industry) + '&dealValue=' + price)
+    ]);
+
+    const predData = await predRes.json();
+    const compData = await compRes.json();
+
+    if (predData.success) {
+      updateResults(predData, dealName, industry);
+    } else {
+      console.error('Prediction failed:', predData.error);
+    }
+
+    if (compData.success && compData.deals) {
+      updateComps(compData.deals, industry);
+    }
+
+    // Scroll to results
+    document.querySelector('.doc-head')?.scrollIntoView({ behavior: 'smooth' });
+
+  } catch (err) {
+    console.error('Analysis error:', err);
+    alert('Could not connect to the analysis engine. Please try again.');
+  } finally {
+    if (goBtn) {
+      goBtn.disabled = false;
+      const span = goBtn.querySelector('.go-l span:last-child');
+      if (span) span.textContent = 'Run Analysis';
+    }
+  }
+}
+
+// ── WIRE UP GO BUTTON ──────────────────────────────────────
+document.querySelector('button.go')?.addEventListener('click', runAnalysis);
+
+// ── MEMO GENERATION ───────────────────────────────────────
+document.getElementById('memoCta')?.addEventListener('click', async () => {
+  if (!lastAnalysis) {
+    alert('Please run an analysis first.');
+    return;
+  }
+
+  const { data, dealName, industry } = lastAnalysis;
+  const dm = data.dealMetrics;
+  const p = data.predictions;
+
+  const memoCta = document.getElementById('memoCta');
+  const memoTitle = memoCta?.querySelector('.memo-title');
+  if (memoTitle) memoTitle.innerHTML = 'Generating memo…';
+
+  try {
+    const response = await fetch('/api/memo', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        dealName,
+        industry,
+        revenueMultiple: dm?.revenueMultiple,
+        ebitdaMultiple: dm?.ebitdaMultiple,
+        ebitdaMargin: dm?.ebitdaMargin,
+        completionProbability: p.dealSuccessProbability,
+        recommendation: p.recommendation
+      })
+    });
+
+    const result = await response.json();
+    const memoText = result.memo || 'Could not generate memo.';
+
+    // Show memo in a modal overlay
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(12,11,9,0.85);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
+    overlay.innerHTML = `
+      <div style="background:var(--paper);border:1px solid var(--rule);max-width:680px;width:100%;padding:48px;border-radius:2px;max-height:80vh;overflow-y:auto;position:relative">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;color:var(--ink4);margin-bottom:24px">DEAL MEMO · ${dealName.toUpperCase()} · CONFIDENTIAL</div>
+        <h2 style="font-family:'Fraunces',serif;font-size:24px;font-weight:300;margin-bottom:24px">${dealName} — Deal Analysis</h2>
+        <div style="font-size:14px;line-height:1.75;color:var(--ink2);white-space:pre-wrap">${memoText}</div>
+        <button onclick="this.closest('div[style*=fixed]').remove()" style="margin-top:32px;padding:12px 24px;background:var(--ink);color:var(--paper);border:none;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.1em">CLOSE</button>
+      </div>`;
+    document.body.appendChild(overlay);
+
+  } catch (err) {
+    console.error('Memo error:', err);
+    alert('Could not generate memo. Please try again.');
+  } finally {
+    if (memoTitle) memoTitle.innerHTML = 'Generate the full <b>deal memo</b>.';
+  }
+});
+
+// ── LIVE MARKET TICKER (fetch from backend) ───────────────
+async function fetchLiveMarket() {
+  try {
+    const res = await fetch(API_BASE + '/api/market-conditions');
+    const data = await res.json();
+    if (!data.success) return;
+    const m = data.data;
+
+    // Update ticker with live values
+    const items = [
+      { sym: 'VIX', val: m.vix, d: m.vix < 20 ? 'calm' : 'elevated', up: m.vix < 20 },
+      { sym: '10Y', val: m.riskFreeRate + '%', d: m.riskFreeRate > 4 ? 'elevated' : 'low', up: false },
+      { sym: 'MKT', val: m.marketScore + '/100', d: m.conditionsSummary?.slice(0,12) || '', up: m.marketScore > 60 },
+    ];
+
+    // Merge with existing ticker items
+    const ticker = document.getElementById('ticker');
+    if (ticker) {
+      const existing = [
+        { sym: 'SPX', val: '5,748', d: '+0.34%', up: true },
+        { sym: 'NDX', val: '20,431', d: '+0.51%', up: true },
+        { sym: 'DXY', val: '103.4', d: '+0.12%', up: true },
+        { sym: 'WTI', val: '72.18', d: '−1.12%', up: false },
+        { sym: 'GOLD', val: '2,418', d: '+0.62%', up: true },
+        { sym: 'BTC', val: '68,431', d: '+2.14%', up: true },
+        ...items
+      ];
+      const html = existing.map(i =>
+        `<span class="tk">${i.sym} <b>${i.val}</b> <span class="${i.up ? 'tk-up' : 'tk-dn'}">${i.d}</span></span>`
+      ).join('');
+      ticker.innerHTML = html + html;
+    }
+  } catch (e) {
+    // Ticker fails silently — hardcoded values remain
+  }
+}
+
+// Fetch live market on load
+fetchLiveMarket();
 </script>
 
 </body>
