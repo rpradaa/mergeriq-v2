@@ -3287,16 +3287,16 @@ function updateResults(data, dealName, industry, dealData) {
     }).join('');
 
     rsnBody.innerHTML = `
-      <div class="rsn-line"><span class="rsn-ts">00:000</span><span class="rsn-tag input">INPUT</span><span class="rsn-arrow">›</span><span class="rsn-msg">deal = <b>${dealName}</b>, price=<b>$${(dealData?.price/1000).toFixed(1)}B</b>, rev=<b>$${parseNum('inRevenue')}M</b>, ebitda=<b>$${parseNum('inEbitda')}M</b></span></div>
-      <div class="rsn-line"><span class="rsn-ts">00:008</span><span class="rsn-tag calc">CALC </span><span class="rsn-arrow">›</span><span class="rsn-msg">revenue_multiple = price / rev = <b>${dm.revenueMultiple}×</b></span></div>
-      <div class="rsn-line"><span class="rsn-ts">00:012</span><span class="rsn-tag calc">CALC </span><span class="rsn-arrow">›</span><span class="rsn-msg">ebitda_multiple = price / ebitda = <b>${dm.ebitdaMultiple}×</b></span></div>
-      <div class="rsn-line"><span class="rsn-ts">00:019</span><span class="rsn-tag check">CHECK</span><span class="rsn-arrow">›</span><span class="rsn-msg">sector_peer[${industry}] = ${m.sectorMultiple}× ; ebitda_margin = <b>${dm.ebitdaMargin}%</b></span></div>
-      ${killLines}
-      <div class="rsn-line"><span class="rsn-ts">00:047</span><span class="rsn-tag calc">CALC </span><span class="rsn-arrow">›</span><span class="rsn-msg">market_score = f(vix=${m.vix}, rate=${m.riskFreeRate}, mult=${m.sectorMultiple}) = <span class="grn">${(m.marketScore/100).toFixed(3)}</span></span></div>
-      <div class="rsn-line"><span class="rsn-ts">00:062</span><span class="rsn-tag calc">CALC </span><span class="rsn-arrow">›</span><span class="rsn-msg">base_prob = logistic( Σ feature × weight ) = <b>${p.baseSuccessProbability}%</b></span></div>
-      <div class="rsn-line"><span class="rsn-ts">00:089</span><span class="rsn-tag calc">CALC </span><span class="rsn-arrow">›</span><span class="rsn-msg">market_adj = ${adjSign}${adj} pp  →  adjusted = <b>${p.dealSuccessProbability}%</b></span></div>
-      <div class="rsn-line"><span class="rsn-ts">00:152</span><span class="rsn-tag check">CHECK</span><span class="rsn-arrow">›</span><span class="rsn-msg">${p.dealSuccessProbability}% ${p.dealSuccessProbability >= 65 ? '≥' : '<'} threshold(65%) <span class="${verdictColor}">∴ verdict = ${verdict}</span></span></div>
-      <div class="rsn-line"><span class="rsn-ts">00:184</span><span class="rsn-tag out">OUT  </span><span class="rsn-arrow">›</span><span class="rsn-msg">emit verdict=<b>${verdict.toLowerCase()}</b>, deal=<b>${dealName}</b><span class="rsn-cursor"></span></span></div>
+      <div class="rsn-line in"><span class="rsn-ts">00:000</span><span class="rsn-tag input">INPUT</span><span class="rsn-arrow">›</span><span class="rsn-msg">deal = <b>${dealName}</b>, price=<b>$${(dealData?.price/1000).toFixed(1)}B</b>, rev=<b>$${parseNum('inRevenue')}M</b>, ebitda=<b>$${parseNum('inEbitda')}M</b></span></div>
+      <div class="rsn-line in"><span class="rsn-ts">00:008</span><span class="rsn-tag calc">CALC </span><span class="rsn-arrow">›</span><span class="rsn-msg">revenue_multiple = price / rev = <b>${dm.revenueMultiple}×</b></span></div>
+      <div class="rsn-line in"><span class="rsn-ts">00:012</span><span class="rsn-tag calc">CALC </span><span class="rsn-arrow">›</span><span class="rsn-msg">ebitda_multiple = price / ebitda = <b>${dm.ebitdaMultiple}×</b></span></div>
+      <div class="rsn-line in"><span class="rsn-ts">00:019</span><span class="rsn-tag check">CHECK</span><span class="rsn-arrow">›</span><span class="rsn-msg">sector_peer[${industry}] = ${m.sectorMultiple}× ; ebitda_margin = <b>${dm.ebitdaMargin}%</b></span></div>
+      ${killLines.replace(/class="rsn-line"/g, 'class="rsn-line in"')}
+      <div class="rsn-line in"><span class="rsn-ts">00:047</span><span class="rsn-tag calc">CALC </span><span class="rsn-arrow">›</span><span class="rsn-msg">market_score = f(vix=${m.vix}, rate=${m.riskFreeRate}, mult=${m.sectorMultiple}) = <span class="grn">${(m.marketScore/100).toFixed(3)}</span></span></div>
+      <div class="rsn-line in"><span class="rsn-ts">00:062</span><span class="rsn-tag calc">CALC </span><span class="rsn-arrow">›</span><span class="rsn-msg">base_prob = logistic( Σ feature × weight ) = <b>${p.baseSuccessProbability}%</b></span></div>
+      <div class="rsn-line in"><span class="rsn-ts">00:089</span><span class="rsn-tag calc">CALC </span><span class="rsn-arrow">›</span><span class="rsn-msg">market_adj = ${adjSign}${adj} pp  →  adjusted = <b>${p.dealSuccessProbability}%</b></span></div>
+      <div class="rsn-line in"><span class="rsn-ts">00:152</span><span class="rsn-tag check">CHECK</span><span class="rsn-arrow">›</span><span class="rsn-msg">${p.dealSuccessProbability}% ${p.dealSuccessProbability >= 65 ? '≥' : '<'} threshold(65%) <span class="${verdictColor}">∴ verdict = ${verdict}</span></span></div>
+      <div class="rsn-line in"><span class="rsn-ts">00:184</span><span class="rsn-tag out">OUT  </span><span class="rsn-arrow">›</span><span class="rsn-msg">emit verdict=<b>${verdict.toLowerCase()}</b>, deal=<b>${dealName}</b><span class="rsn-cursor"></span></span></div>
     `;
   }
 
