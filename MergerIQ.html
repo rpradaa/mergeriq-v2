@@ -2047,17 +2047,17 @@ select.fi{
           <div class="dh-analysis"><span>Deliverable</span><span style="color:var(--ink5)">·</span><b id="dealTitle">Adobe / Figma Analysis</b></div>
 
           <div class="dh-deal">
-            <span>Adobe Inc.</span>
+            <span id="dealAcquirer">Adobe Inc.</span>
             <span class="arrow">/</span>
-            <span>Figma Inc.</span>
-            <span class="meta">Sept 15, 2022 · $20,000M · Cash + Stock</span>
+            <span id="dealTarget">Figma Inc.</span>
+            <span class="meta" id="dealMeta">Sept 15, 2022 · $20,000M · Cash + Stock</span>
           </div>
 
-          <div class="dh-verdict" aria-label="Do not proceed">
+          <div class="dh-verdict" id="dealVerdict" aria-label="Do not proceed">
             <span class="wrd w1">Do not</span><br/><em><span class="wrd w2">proceed.</span></em>
           </div>
 
-          <div class="dh-deck">
+          <div class="dh-deck" id="dealDeck">
             Two thresholds breached. The price implies a multiple <em>more than triple</em> the SaaS peer set, and regulators will treat this as horizontal consolidation. Model recommends <em>terminate</em> at the present price; counter-bid below $14.2B materially shifts the verdict.
           </div>
         </div>
@@ -2072,8 +2072,8 @@ select.fi{
             </div>
             <div class="pb-rt">
               <div>Completion probability</div>
-              <div>Base <b>51.4%</b></div>
-              <div>Adjusted <b>+3.0%</b></div>
+              <div>Base <b id="baseProb">51.4%</b></div>
+              <div>Adjusted <b id="adjProb">+3.0%</b></div>
               <div>Threshold <b>≥ 65%</b></div>
             </div>
           </div>
@@ -3117,15 +3117,48 @@ function animateCounter(el, target, duration = 1400) {
 }
 
 // ── UPDATE RESULTS UI ─────────────────────────────────────
-function updateResults(data, dealName, industry) {
+function updateResults(data, dealName, industry, dealData) {
   const p = data.predictions;
   const m = data.marketConditions;
   const k = data.killCriteria;
   const dm = data.dealMetrics;
 
-  // Deal title
+  // Parse acquirer/target from dealName
+  const parts = dealName.split(' / ');
+  const acquirer = parts[0] || 'Acquirer';
+  const target = parts[1] || 'Target';
+
+  // Deal header
   const titleEl = document.getElementById('dealTitle');
   if (titleEl) titleEl.textContent = dealName + ' Analysis';
+  const acqEl = document.getElementById('dealAcquirer');
+  if (acqEl) acqEl.textContent = acquirer;
+  const tgtEl = document.getElementById('dealTarget');
+  if (tgtEl) tgtEl.textContent = target;
+  const metaEl = document.getElementById('dealMeta');
+  if (metaEl) {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const price = dealData?.price ? '$' + Number(dealData.price).toLocaleString() + 'M' : '';
+    const payment = dealData?.payment || '';
+    metaEl.textContent = dateStr + (price ? ' · ' + price : '') + (payment ? ' · ' + payment : '');
+  }
+
+  // Verdict
+  const verdictEl = document.getElementById('dealVerdict');
+  if (verdictEl) {
+    const prob = p.dealSuccessProbability;
+    let verdict, verdictClass;
+    if (prob >= 70) { verdict = ['Proceed', '']; verdictClass = 'green'; }
+    else if (prob >= 50) { verdict = ['Proceed with', 'caution.']; verdictClass = 'amber'; }
+    else { verdict = ['Do not', 'proceed.']; verdictClass = 'red'; }
+    verdictEl.setAttribute('aria-label', verdict.join(' '));
+    verdictEl.innerHTML = `<span class="wrd w1">${verdict[0]}</span>${verdict[1] ? '<br/><em><span class="wrd w2">' + verdict[1] + '</span></em>' : ''}`;
+  }
+
+  // Deck text
+  const deckEl = document.getElementById('dealDeck');
+  if (deckEl) deckEl.textContent = p.recommendation;
 
   // Probability
   const probEl = document.getElementById('probFig');
@@ -3134,16 +3167,25 @@ function updateResults(data, dealName, industry) {
     animateCounter(probEl, p.dealSuccessProbability);
   }
 
+  // Base/adjusted prob
+  const baseEl = document.getElementById('baseProb');
+  if (baseEl) baseEl.textContent = p.baseSuccessProbability + '%';
+  const adjEl = document.getElementById('adjProb');
+  if (adjEl) {
+    const adj = (p.dealSuccessProbability - p.baseSuccessProbability).toFixed(1);
+    adjEl.textContent = (adj >= 0 ? '+' : '') + adj + '%';
+  }
+
   // Axis label
   const axisEl = document.querySelector('.pb-axis .here');
   if (axisEl) axisEl.textContent = '→ ' + p.dealSuccessProbability + '%';
 
-  // Delta to threshold (65%)
+  // Delta to threshold
   const delta = (p.dealSuccessProbability - 65).toFixed(1);
-  const footEl = document.querySelector('.pb-foot span.neg, .pb-foot span.pos');
-  if (footEl) {
-    footEl.textContent = (delta >= 0 ? '+' : '') + delta + ' pp';
-    footEl.className = delta >= 0 ? 'pos' : 'neg';
+  const footSpan = document.querySelector('.pb-foot span:last-child');
+  if (footSpan) {
+    footSpan.textContent = (delta >= 0 ? '+' : '') + delta + ' pp';
+    footSpan.className = delta >= 0 ? 'pos' : 'neg';
   }
 
   // Metrics
@@ -3169,15 +3211,18 @@ function updateResults(data, dealName, industry) {
     const mktEl = document.getElementById('val-mkt');
     if (mktEl) mktEl.innerHTML = m.marketScore + '<span style="font-size:0.5em;color:var(--ink4)">/100</span>';
 
-    // Update market section header timestamp
-    const mktHeader = document.querySelector('#val-rate')?.closest('section')?.querySelector('.sec-h-r');
-    if (mktHeader) {
-      const now = new Date();
-      mktHeader.textContent = dealName + ' · live at runtime · last tick ' +
-        now.getHours().toString().padStart(2,'0') + ':' +
-        now.getMinutes().toString().padStart(2,'0') + ':' +
-        now.getSeconds().toString().padStart(2,'0');
-    }
+    // Market section header
+    const mktHeader = document.querySelector('.sec-h-r');
+    const allHeaders = document.querySelectorAll('.sec-h-r');
+    allHeaders.forEach(h => {
+      if (h.textContent.includes('live at runtime')) {
+        const now = new Date();
+        h.textContent = dealName + ' · live at runtime · last tick ' +
+          now.getHours().toString().padStart(2,'0') + ':' +
+          now.getMinutes().toString().padStart(2,'0') + ':' +
+          now.getSeconds().toString().padStart(2,'0');
+      }
+    });
   }
 
   // Kill criteria
@@ -3188,7 +3233,6 @@ function updateResults(data, dealName, industry) {
     const firing = k.filter(c => c.severity !== 'none').length;
     if (killTitle) killTitle.textContent = '§ 4.2  Kill Criteria — ' + firing + ' firing';
     if (killSub) killSub.textContent = firing === 0 ? 'No critical issues detected.' : firing + ' threshold' + (firing > 1 ? 's' : '') + ' breached; analyst review recommended.';
-
     killList.innerHTML = k.map((c, i) => {
       if (c.severity === 'none') return `<div class="ka"><div class="ka-body"><div class="title">No Critical Issues</div><div class="desc">All key metrics within acceptable ranges for this deal.</div></div></div>`;
       const isHigh = c.severity === 'high';
@@ -3205,14 +3249,15 @@ function updateResults(data, dealName, industry) {
     }).join('');
   }
 
-  // Reasoning trace header
-  const rsnHeader = document.querySelector('#rsn-body')?.closest('section')?.querySelector('.sec-h-r');
-  if (rsnHeader) rsnHeader.textContent = dealName + ' · why this score · ' + (data.featureImportance?.length || 8) + ' steps · ' + Math.round(Math.random() * 100 + 100) + 'ms';
-
-  // Scenario headers
+  // Update all section headers with deal name
   document.querySelectorAll('.sec-h-l').forEach(el => {
-    if (el.textContent.includes('Scenario Analysis') || el.textContent.includes('Comparable')) {
-      el.textContent = el.textContent.replace(/^[^—]+—/, dealName + ' —');
+    if (el.textContent.includes(' — Scenario') || el.textContent.includes(' — Comparable')) {
+      el.textContent = el.textContent.replace(/^.+ — /, dealName + ' — ');
+    }
+  });
+  document.querySelectorAll('.sec-h-r').forEach(el => {
+    if (el.textContent.includes('Adobe / Figma') || el.textContent.includes('why this score')) {
+      el.textContent = el.textContent.replace('Adobe / Figma', dealName);
     }
   });
 
@@ -3298,7 +3343,7 @@ async function runAnalysis() {
     const compData = await compRes.json();
 
     if (predData.success) {
-      updateResults(predData, dealName, industry);
+      updateResults(predData, dealName, industry, { price, payment });
     } else {
       console.error('Prediction failed:', predData.error);
     }
