@@ -1936,8 +1936,8 @@ select.fi{
         <button class="mode-b" data-mode="new">Analyze<br/>New</button>
       </div>
       <select class="deal-pick" id="dealPick" style="margin-top:12px">
-        <option>— Select a case —</option>
-        <option selected>Adobe / Figma — $20B · SaaS</option>
+        <option value="" selected>— Select a case —</option>
+        <option>Adobe / Figma — $20B · SaaS</option>
         <option>MSFT / Activision — $68.7B · Gaming</option>
         <option>Salesforce / Slack — $27.7B · SaaS</option>
         <option>Broadcom / VMware — $61B · SaaS</option>
@@ -2997,12 +2997,13 @@ function clearInputs(){
         pick.style.display = '';
         if(title) title.textContent = '§ 0.1  Deal Parameters';
         if(mode === 'live'){
-          // a "live" deal in market — seed with the open MSFT/Activision-style case
           pick.value = 'MSFT / Activision — $68.7B · Gaming';
+          applyCase(pick.value);
         } else {
-          pick.value = 'Adobe / Figma — $20B · SaaS';
+          // concluded mode — show blank, wait for user to pick
+          pick.value = '';
+          clearInputs();
         }
-        applyCase(pick.value);
       }
     });
   });
