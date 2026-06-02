@@ -1903,6 +1903,7 @@ select.fi{
     <div class="nm"><div class="nm-l">Model</div><div class="nm-v">v3.2.1-stable</div></div>
     <div class="nm"><div class="nm-l">Analyst</div><div class="nm-v">C. Lee</div></div>
     <div class="nm"><div class="nm-l">Issued</div><div class="nm-v">22 May 26</div></div>
+    <div class="nm" style="cursor:pointer" onclick="currentUser ? supabase.auth.signOut() : showAuthModal()"><div class="nm-l">Account</div><div class="nm-v" id="authBtn" style="color:var(--ink3)">Sign In</div></div>
   </div>
 </nav>
 
@@ -3396,6 +3397,193 @@ function updateComps(deals, industry) {
   }).join('');
 }
 
+// ── SUPABASE INTEGRATION ──────────────────────────────────
+const SUPABASE_URL = 'https://fafpldipudrxlgpvnron.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_cNIq4tlyNkQ_0Kpl8dEpiw_CnjeIX1g';
+
+// Load Supabase SDK
+const supabaseScript = document.createElement('script');
+supabaseScript.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
+document.head.appendChild(supabaseScript);
+
+let supabase = null;
+let currentUser = null;
+let searchCount = 0;
+let pendingDealData = null;
+
+supabaseScript.onload = async () => {
+  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+  
+  // Check for existing session
+  const { data: { session } } = await supabase.auth.getSession();
+  if (session?.user) {
+    currentUser = session.user;
+    updateAuthUI(currentUser);
+  }
+
+  // Listen for auth changes
+  supabase.auth.onAuthStateChange((_event, session) => {
+    currentUser = session?.user || null;
+    updateAuthUI(currentUser);
+    if (currentUser && pendingDealData) {
+      saveDeal(pendingDealData);
+      pendingDealData = null;
+    }
+  });
+};
+
+// ── AUTH UI ────────────────────────────────────────────────
+function updateAuthUI(user) {
+  const authBtn = document.getElementById('authBtn');
+  if (!authBtn) return;
+  if (user) {
+    authBtn.textContent = user.email?.split('@')[0] || 'Account';
+    authBtn.style.color = 'var(--green)';
+  } else {
+    authBtn.textContent = 'Sign In';
+    authBtn.style.color = 'var(--ink3)';
+  }
+}
+
+// ── SIGNUP MODAL ───────────────────────────────────────────
+function showAuthModal(onSuccess) {
+  const existing = document.getElementById('authModal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'authModal';
+  modal.style.cssText = 'position:fixed;inset:0;background:rgba(12,11,9,0.88);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px';
+  modal.innerHTML = `
+    <div style="background:var(--paper);border:1px solid var(--rule);max-width:480px;width:100%;padding:48px;border-radius:2px;position:relative">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.12em;color:var(--ink4);margin-bottom:8px">MERGERIQ · ACCESS</div>
+      <h2 style="font-family:'Fraunces',serif;font-size:28px;font-weight:300;margin-bottom:8px;color:var(--ink)">Save your analysis.</h2>
+      <p style="font-size:13px;color:var(--ink3);margin-bottom:32px;line-height:1.6">Create a free account to save this deal, access it later, and build your deal history.</p>
+      
+      <div id="authError" style="display:none;background:#fff0f0;border:1px solid var(--red);padding:10px 14px;font-size:12px;color:var(--red);margin-bottom:16px;border-radius:2px"></div>
+      
+      <div style="margin-bottom:16px">
+        <label style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--ink4);display:block;margin-bottom:6px">NAME</label>
+        <input id="authName" type="text" placeholder="Your name" style="width:100%;padding:10px 12px;border:1px solid var(--rule);background:var(--paper);font-size:13px;font-family:'Space Grotesk',sans-serif;color:var(--ink);box-sizing:border-box;outline:none"/>
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--ink4);display:block;margin-bottom:6px">COMPANY & ROLE</label>
+        <input id="authRole" type="text" placeholder="e.g. Associate at Lazard" style="width:100%;padding:10px 12px;border:1px solid var(--rule);background:var(--paper);font-size:13px;font-family:'Space Grotesk',sans-serif;color:var(--ink);box-sizing:border-box;outline:none"/>
+      </div>
+      <div style="margin-bottom:16px">
+        <label style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--ink4);display:block;margin-bottom:6px">EMAIL</label>
+        <input id="authEmail" type="email" placeholder="your@email.com" style="width:100%;padding:10px 12px;border:1px solid var(--rule);background:var(--paper);font-size:13px;font-family:'Space Grotesk',sans-serif;color:var(--ink);box-sizing:border-box;outline:none"/>
+      </div>
+      <div style="margin-bottom:24px">
+        <label style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--ink4);display:block;margin-bottom:6px">PASSWORD</label>
+        <input id="authPassword" type="password" placeholder="Minimum 6 characters" style="width:100%;padding:10px 12px;border:1px solid var(--rule);background:var(--paper);font-size:13px;font-family:'Space Grotesk',sans-serif;color:var(--ink);box-sizing:border-box;outline:none"/>
+      </div>
+      
+      <button id="authSubmit" onclick="handleSignup()" style="width:100%;padding:14px;background:var(--ink);color:var(--paper);border:none;cursor:pointer;font-family:'JetBrains Mono',monospace;font-size:11px;letter-spacing:0.1em;margin-bottom:16px">CREATE ACCOUNT & SAVE DEAL</button>
+      <div style="text-align:center;font-size:12px;color:var(--ink4)">Already have an account? <span onclick="showLoginView()" style="color:var(--ink);cursor:pointer;text-decoration:underline">Sign in</span></div>
+      <button onclick="document.getElementById('authModal').remove()" style="position:absolute;top:16px;right:16px;background:none;border:none;cursor:pointer;font-size:18px;color:var(--ink4)">×</button>
+    </div>
+  `;
+  document.body.appendChild(modal);
+}
+
+function showLoginView() {
+  const modal = document.getElementById('authModal');
+  if (!modal) return;
+  modal.querySelector('h2').textContent = 'Welcome back.';
+  modal.querySelector('p').textContent = 'Sign in to access your saved deals.';
+  const nameField = modal.querySelector('#authName')?.closest('div[style*="margin-bottom:16px"]');
+  const roleField = modal.querySelector('#authRole')?.closest('div[style*="margin-bottom:16px"]');
+  if (nameField) nameField.style.display = 'none';
+  if (roleField) roleField.style.display = 'none';
+  modal.querySelector('#authSubmit').textContent = 'SIGN IN';
+  modal.querySelector('#authSubmit').onclick = handleLogin;
+  modal.querySelector('div[style*="text-align:center"]').innerHTML = 'New to MergerIQ? <span onclick="location.reload()" style="color:var(--ink);cursor:pointer;text-decoration:underline">Create account</span>';
+}
+
+async function handleSignup() {
+  const email = document.getElementById('authEmail')?.value?.trim();
+  const password = document.getElementById('authPassword')?.value;
+  const name = document.getElementById('authName')?.value?.trim();
+  const role = document.getElementById('authRole')?.value?.trim();
+  const errEl = document.getElementById('authError');
+  const btn = document.getElementById('authSubmit');
+
+  if (!email || !password) {
+    errEl.textContent = 'Please enter your email and password.';
+    errEl.style.display = 'block';
+    return;
+  }
+
+  btn.textContent = 'Creating account…';
+  btn.disabled = true;
+
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: { data: { name, role } }
+  });
+
+  if (error) {
+    errEl.textContent = error.message;
+    errEl.style.display = 'block';
+    btn.textContent = 'CREATE ACCOUNT & SAVE DEAL';
+    btn.disabled = false;
+    return;
+  }
+
+  document.getElementById('authModal').remove();
+  showConfirmation('Account created! Check your email to confirm, then your deal will be saved.');
+}
+
+async function handleLogin() {
+  const email = document.getElementById('authEmail')?.value?.trim();
+  const password = document.getElementById('authPassword')?.value;
+  const errEl = document.getElementById('authError');
+  const btn = document.getElementById('authSubmit');
+
+  btn.textContent = 'Signing in…';
+  btn.disabled = true;
+
+  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+  if (error) {
+    errEl.textContent = error.message;
+    errEl.style.display = 'block';
+    btn.textContent = 'SIGN IN';
+    btn.disabled = false;
+    return;
+  }
+
+  document.getElementById('authModal').remove();
+  showConfirmation('Signed in. Your deal analysis has been saved.');
+}
+
+function showConfirmation(msg) {
+  const toast = document.createElement('div');
+  toast.style.cssText = 'position:fixed;bottom:32px;right:32px;background:var(--ink);color:var(--paper);padding:14px 20px;font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:0.08em;z-index:9999;border-radius:2px;max-width:360px;line-height:1.5';
+  toast.textContent = msg;
+  document.body.appendChild(toast);
+  setTimeout(() => toast.remove(), 5000);
+}
+
+// ── SAVE DEAL TO SUPABASE ──────────────────────────────────
+async function saveDeal(dealPayload) {
+  if (!supabase || !currentUser) return;
+  const { error } = await supabase.from('deals').insert({
+    user_id: currentUser.id,
+    deal_name: dealPayload.dealName,
+    industry: dealPayload.industry,
+    payment: dealPayload.payment,
+    revenue: dealPayload.revenue,
+    ebitda: dealPayload.ebitda,
+    deal_size: dealPayload.price,
+    premium: dealPayload.premium,
+    completion_probability: dealPayload.probability,
+    recommendation: dealPayload.recommendation
+  });
+  if (!error) showConfirmation('Deal analysis saved to your account.');
+}
+
 // ── MAIN ANALYZE FUNCTION ─────────────────────────────────
 async function runAnalysis() {
   const target = document.getElementById('inTarget')?.value?.trim();
@@ -3449,6 +3637,24 @@ async function runAnalysis() {
 
     if (predData.success) {
       updateResults(predData, dealName, industry, { price, payment });
+
+      // Track search count and trigger signup modal on second search
+      searchCount++;
+      const dealPayload = {
+        dealName, industry, payment,
+        revenue, ebitda, price, premium,
+        probability: predData.predictions.dealSuccessProbability,
+        recommendation: predData.predictions.recommendation
+      };
+
+      if (currentUser) {
+        // User is logged in — save immediately
+        saveDeal(dealPayload);
+      } else if (searchCount >= 2) {
+        // Second search — show signup modal
+        pendingDealData = dealPayload;
+        showAuthModal();
+      }
     } else {
       console.error('Prediction failed:', predData.error);
     }
