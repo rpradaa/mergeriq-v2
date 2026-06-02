@@ -2020,6 +2020,14 @@ select.fi{
         <path d="M2.5 6.5h8M8 3.5l3 3-3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
+
+    <!-- MY DEALS PANEL -->
+    <div id="myDealsPanel" style="display:none;margin-top:24px;border-top:1px solid var(--rule);padding-top:16px">
+      <div style="font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.1em;color:var(--ink4);margin-bottom:12px">§ 0.2  SAVED DEALS</div>
+      <div id="myDealsList" style="display:flex;flex-direction:column;gap:8px">
+        <div style="font-size:12px;color:var(--ink4)">Loading your deals…</div>
+      </div>
+    </div>
   </aside>
 
   <!-- MAIN -->
@@ -3435,16 +3443,70 @@ const supabaseInterval = setInterval(() => {
   }
 }, 100);
 
+// ── MY DEALS PANEL ────────────────────────────────────────
+async function loadMyDeals() {
+  if (!sbClient || !currentUser) return;
+  const panel = document.getElementById('myDealsPanel');
+  const list = document.getElementById('myDealsList');
+  if (!panel || !list) return;
+
+  panel.style.display = 'block';
+
+  const { data, error } = await sbClient
+    .from('deals')
+    .select('*')
+    .eq('user_id', currentUser.id)
+    .order('created_at', { ascending: false })
+    .limit(10);
+
+  if (error || !data || data.length === 0) {
+    list.innerHTML = '<div style="font-size:12px;color:var(--ink4)">No saved deals yet.</div>';
+    return;
+  }
+
+  list.innerHTML = data.map(d => {
+    const date = new Date(d.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    const prob = d.completion_probability;
+    const color = prob >= 70 ? 'var(--green)' : prob >= 50 ? 'var(--amber)' : 'var(--red)';
+    return `<div onclick="loadSavedDeal(${JSON.stringify(d).replace(/"/g, '&quot;')})" style="padding:10px 12px;border:1px solid var(--rule);cursor:pointer;border-radius:2px;background:var(--paper)" onmouseover="this.style.borderColor='var(--ink3)'" onmouseout="this.style.borderColor='var(--rule)'">
+      <div style="font-size:12px;font-weight:500;color:var(--ink);margin-bottom:4px">${d.deal_name}</div>
+      <div style="display:flex;justify-content:space-between;font-family:'JetBrains Mono',monospace;font-size:10px">
+        <span style="color:var(--ink4)">${d.industry} · ${date}</span>
+        <span style="color:${color};font-weight:600">${prob}%</span>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function loadSavedDeal(deal) {
+  // Populate inputs with saved deal data
+  const setVal = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ''; };
+  setVal('inTarget', deal.deal_name?.split(' / ')[1] || deal.deal_name);
+  setVal('inRevenue', deal.revenue);
+  setVal('inEbitda', deal.ebitda);
+  setVal('inPrice', deal.deal_size);
+  setVal('inPremium', deal.premium);
+  const ind = document.getElementById('inIndustry');
+  if (ind) ind.value = deal.industry;
+  const pay = document.getElementById('inPayment');
+  if (pay) pay.value = deal.payment;
+  // Scroll to top
+  document.querySelector('.sidebar')?.scrollIntoView({ behavior: 'smooth' });
+}
+
 // ── AUTH UI ────────────────────────────────────────────────
 function updateAuthUI(user) {
   const authBtn = document.getElementById('authBtn');
+  const panel = document.getElementById('myDealsPanel');
   if (!authBtn) return;
   if (user) {
-    authBtn.textContent = user.email?.split('@')[0] || 'Account';
+    authBtn.textContent = user.user_metadata?.name || user.email?.split('@')[0] || 'Account';
     authBtn.style.color = 'var(--green)';
+    loadMyDeals();
   } else {
     authBtn.textContent = 'Sign In';
     authBtn.style.color = 'var(--ink3)';
+    if (panel) panel.style.display = 'none';
   }
 }
 
@@ -3535,8 +3597,29 @@ async function handleSignup() {
       return;
     }
 
+    // Save deal immediately with the new user's ID
+    if (data?.user && pendingDealData) {
+      const { error: saveError } = await sbClient.from('deals').insert({
+        user_id: data.user.id,
+        deal_name: pendingDealData.dealName,
+        industry: pendingDealData.industry,
+        payment: pendingDealData.payment,
+        revenue: pendingDealData.revenue,
+        ebitda: pendingDealData.ebitda,
+        deal_size: pendingDealData.price,
+        premium: pendingDealData.premium,
+        completion_probability: pendingDealData.probability,
+        recommendation: pendingDealData.recommendation
+      });
+      if (!saveError) {
+        pendingDealData = null;
+      }
+    }
+
+    currentUser = data?.user;
+    updateAuthUI(currentUser);
     document.getElementById('authModal').remove();
-    showConfirmation('Account created! Your deal has been saved.');
+    showConfirmation('Account created! Your deal analysis has been saved.');
   } catch (err) {
     errEl.textContent = 'Connection error: ' + err.message;
     errEl.style.display = 'block';
@@ -3591,7 +3674,10 @@ async function saveDeal(dealPayload) {
     completion_probability: dealPayload.probability,
     recommendation: dealPayload.recommendation
   });
-  if (!error) showConfirmation('Deal analysis saved to your account.');
+  if (!error) {
+    showConfirmation('Deal analysis saved to your account.');
+    loadMyDeals();
+  }
 }
 
 // ── MAIN ANALYZE FUNCTION ─────────────────────────────────
