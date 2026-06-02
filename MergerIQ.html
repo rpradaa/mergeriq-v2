@@ -2836,12 +2836,15 @@ select.fi{
 
 <script>
 // Loader
+// Loader — dismiss after timeout regardless of external resource state
+setTimeout(() => {
+  const loader = document.getElementById('loader');
+  if (loader) loader.classList.add('gone');
+  setTimeout(startCounter, 600);
+}, 2200);
 window.addEventListener('load', () => {
-  setTimeout(() => {
-    document.getElementById('loader').classList.add('gone');
-    // Kick off probability counter shortly after loader exits
-    setTimeout(startCounter, 600);
-  }, 1900);
+  const loader = document.getElementById('loader');
+  if (loader) loader.classList.add('gone');
 });
 
 // Probability counter — counts up to target value
@@ -3363,17 +3366,6 @@ function updateResults(data, dealName, industry, dealData) {
   }
 
   // Autopsy section — update with deal name and outcome
-  const autopsyDek = document.getElementById('autopsyDek');
-  const autopsySub = document.getElementById('autopsySub');
-  if (autopsyDek) {
-    const outcome = p.dealSuccessProbability >= 65 ? 'completed' : 'faced significant obstacles';
-    autopsyDek.innerHTML = `The model predicted this deal would ${outcome}. Run this analysis to compare MergerIQ's verdict against what actually happened with <em>${dealName}</em>.`;
-  }
-  if (autopsySub) {
-    const now = new Date();
-    autopsySub.textContent = 'Analysis run ' + now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  }
-
   // Store for memo
   lastAnalysis = { data, dealName, industry };
 }
