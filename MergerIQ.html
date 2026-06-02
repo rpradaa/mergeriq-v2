@@ -3417,14 +3417,22 @@ let pendingDealData = null;
 
 function initSupabase() {
   if (window.supabase && !sbClient) {
-    sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true
+      }
+    });
     sbClient.auth.getSession().then(({ data: { session } }) => {
+      console.log('Session on init:', session?.user?.email || 'none');
       if (session?.user) {
         currentUser = session.user;
         updateAuthUI(currentUser);
       }
     });
     sbClient.auth.onAuthStateChange((_event, session) => {
+      console.log('Auth state change:', _event, session?.user?.email || 'none');
       currentUser = session?.user || null;
       updateAuthUI(currentUser);
       if (currentUser && pendingDealData) {
@@ -3661,8 +3669,14 @@ function showConfirmation(msg) {
 
 // ── SAVE DEAL TO SUPABASE ──────────────────────────────────
 async function saveDeal(dealPayload) {
-  if (!sbClient || !currentUser) return;
-  const { error } = await sbClient.from('deals').insert({
+  if (!sbClient || !currentUser) {
+    console.log('saveDeal blocked: sbClient=', !!sbClient, 'currentUser=', !!currentUser);
+    return;
+  }
+  const { data: { session } } = await sbClient.auth.getSession();
+  console.log('Saving deal, session token exists:', !!session?.access_token);
+  console.log('Saving deal:', dealPayload.dealName, 'for user:', currentUser.id);
+  const { data, error } = await sbClient.from('deals').insert({
     user_id: currentUser.id,
     deal_name: dealPayload.dealName,
     industry: dealPayload.industry,
@@ -3673,10 +3687,13 @@ async function saveDeal(dealPayload) {
     premium: dealPayload.premium,
     completion_probability: dealPayload.probability,
     recommendation: dealPayload.recommendation
-  });
+  }).select();
+  console.log('Save result:', data, 'Error:', error);
   if (!error) {
     showConfirmation('Deal analysis saved to your account.');
     loadMyDeals();
+  } else {
+    console.error('Save failed:', error.message, error.details, error.hint);
   }
 }
 
