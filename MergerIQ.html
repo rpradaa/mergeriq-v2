@@ -1850,6 +1850,7 @@ select.fi{
 
 </style>
 </head>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <body>
 
 <!-- LOADER -->
@@ -1903,7 +1904,7 @@ select.fi{
     <div class="nm"><div class="nm-l">Model</div><div class="nm-v">v3.2.1-stable</div></div>
     <div class="nm"><div class="nm-l">Analyst</div><div class="nm-v">C. Lee</div></div>
     <div class="nm"><div class="nm-l">Issued</div><div class="nm-v">22 May 26</div></div>
-    <div class="nm" style="cursor:pointer" onclick="currentUser ? supabase.auth.signOut() : showAuthModal()"><div class="nm-l">Account</div><div class="nm-v" id="authBtn" style="color:var(--ink3)">Sign In</div></div>
+    <div class="nm" style="cursor:pointer" onclick="currentUser ? sbClient.auth.signOut() : showAuthModal()"><div class="nm-l">Account</div><div class="nm-v" id="authBtn" style="color:var(--ink3)">Sign In</div></div>
   </div>
 </nav>
 
@@ -3401,36 +3402,38 @@ function updateComps(deals, industry) {
 const SUPABASE_URL = 'https://fafpldipudrxlgpvnron.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZnBsZGlwdWRyeGxncHZucm9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MjA0MTksImV4cCI6MjA5NTk5NjQxOX0.sd2ocjPnhsgVpQfl2978mKhbppbLWAAjqdcrNo6UuLo';
 
-// Load Supabase SDK
-const supabaseScript = document.createElement('script');
-supabaseScript.src = 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2';
-document.head.appendChild(supabaseScript);
-
-let supabase = null;
+let sbClient = null;
 let currentUser = null;
 let searchCount = 0;
 let pendingDealData = null;
 
-supabaseScript.onload = async () => {
-  supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  
-  // Check for existing session
-  const { data: { session } } = await supabase.auth.getSession();
-  if (session?.user) {
-    currentUser = session.user;
-    updateAuthUI(currentUser);
+function initSupabase() {
+  if (window.supabase && !sbClient) {
+    sbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    sbClient.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        currentUser = session.user;
+        updateAuthUI(currentUser);
+      }
+    });
+    sbClient.auth.onAuthStateChange((_event, session) => {
+      currentUser = session?.user || null;
+      updateAuthUI(currentUser);
+      if (currentUser && pendingDealData) {
+        saveDeal(pendingDealData);
+        pendingDealData = null;
+      }
+    });
   }
+}
 
-  // Listen for auth changes
-  supabase.auth.onAuthStateChange((_event, session) => {
-    currentUser = session?.user || null;
-    updateAuthUI(currentUser);
-    if (currentUser && pendingDealData) {
-      saveDeal(pendingDealData);
-      pendingDealData = null;
-    }
-  });
-};
+// Poll until Supabase SDK is ready
+const supabaseInterval = setInterval(() => {
+  if (window.supabase) {
+    initSupabase();
+    clearInterval(supabaseInterval);
+  }
+}, 100);
 
 // ── AUTH UI ────────────────────────────────────────────────
 function updateAuthUI(user) {
@@ -3517,22 +3520,29 @@ async function handleSignup() {
   btn.textContent = 'Creating account…';
   btn.disabled = true;
 
-  const { data, error } = await supabase.auth.signUp({
-    email,
-    password,
-    options: { data: { name, role } }
-  });
+  try {
+    const { data, error } = await sbClient.auth.signUp({
+      email,
+      password,
+      options: { data: { name, role } }
+    });
 
-  if (error) {
-    errEl.textContent = error.message;
+    if (error) {
+      errEl.textContent = error.message;
+      errEl.style.display = 'block';
+      btn.textContent = 'CREATE ACCOUNT & SAVE DEAL';
+      btn.disabled = false;
+      return;
+    }
+
+    document.getElementById('authModal').remove();
+    showConfirmation('Account created! Your deal has been saved.');
+  } catch (err) {
+    errEl.textContent = 'Connection error: ' + err.message;
     errEl.style.display = 'block';
     btn.textContent = 'CREATE ACCOUNT & SAVE DEAL';
     btn.disabled = false;
-    return;
   }
-
-  document.getElementById('authModal').remove();
-  showConfirmation('Account created! Check your email to confirm, then your deal will be saved.');
 }
 
 async function handleLogin() {
@@ -3544,7 +3554,7 @@ async function handleLogin() {
   btn.textContent = 'Signing in…';
   btn.disabled = true;
 
-  const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+  const { data, error } = await sbClient.auth.signInWithPassword({ email, password });
 
   if (error) {
     errEl.textContent = error.message;
@@ -3568,8 +3578,8 @@ function showConfirmation(msg) {
 
 // ── SAVE DEAL TO SUPABASE ──────────────────────────────────
 async function saveDeal(dealPayload) {
-  if (!supabase || !currentUser) return;
-  const { error } = await supabase.from('deals').insert({
+  if (!sbClient || !currentUser) return;
+  const { error } = await sbClient.from('deals').insert({
     user_id: currentUser.id,
     deal_name: dealPayload.dealName,
     industry: dealPayload.industry,
