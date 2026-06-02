@@ -1952,7 +1952,7 @@ select.fi{
 
       <div class="field">
         <div class="fl"><span>Target <span class="tip" tabindex="0" data-tip="The company being acquired. MergerIQ benchmarks it against comparable transactions in the same sector and size range.">i</span></span><span class="opt">required</span></div>
-        <input class="fi" id="inTarget" value="Figma" placeholder="Company name"/>
+        <input class="fi" id="inTarget" value="" placeholder="Company name"/>
         <div class="fhint">The company being bought.</div>
       </div>
 
@@ -1985,12 +1985,12 @@ select.fi{
       <div class="frow">
         <div class="field">
           <div class="fl">Revenue <span class="opt">$M</span> <span class="tip" tabindex="0" data-tip="The target's annual revenue — its total sales before any costs. MergerIQ compares the price paid against this to compute the revenue multiple.">i</span></div>
-          <input class="fi" id="inRevenue" value="400"/>
+          <input class="fi" id="inRevenue" value="" placeholder="e.g. 400"/>
           <div class="fhint">The company's yearly sales.</div>
         </div>
         <div class="field">
           <div class="fl">EBITDA <span class="opt">$M</span> <span class="tip" tabindex="0" data-tip="EBITDA is the target's core operating profit — what it earns before interest, taxes, and accounting adjustments. It is the cleanest read on whether the underlying business actually makes money.">i</span></div>
-          <input class="fi" id="inEbitda" value="80"/>
+          <input class="fi" id="inEbitda" value="" placeholder="e.g. 80"/>
           <div class="fhint">Yearly profit from its core business.</div>
         </div>
       </div>
@@ -1998,12 +1998,12 @@ select.fi{
       <div class="frow">
         <div class="field">
           <div class="fl">Deal Size <span class="opt">$M</span> <span class="tip" tabindex="0" data-tip="The total amount the buyer is paying to acquire the target. Deals over &lt;b&gt;$500M&lt;/b&gt; typically trigger regulatory review by the FTC or DOJ. Deals over &lt;b&gt;$1B&lt;/b&gt; almost always face a formal investigation.">i</span></div>
-          <input class="fi" id="inPrice" value="20,000"/>
+          <input class="fi" id="inPrice" value="" placeholder="e.g. 20,000"/>
           <div class="fhint">Total price the buyer pays.</div>
         </div>
         <div class="field">
           <div class="fl">Premium <span class="opt">%</span> <span class="tip" tabindex="0" data-tip="The extra amount the buyer pays above the target's current market price to convince shareholders to sell. 30–50% is typical; far higher signals overpayment risk.">i</span></div>
-          <input class="fi" id="inPremium" value="50"/>
+          <input class="fi" id="inPremium" value="" placeholder="e.g. 50"/>
           <div class="fhint">Extra % paid above market price.</div>
         </div>
       </div>
@@ -2058,7 +2058,7 @@ select.fi{
           </div>
 
           <div class="dh-deck" id="dealDeck">
-            Two thresholds breached. The price implies a multiple <em>more than triple</em> the SaaS peer set, and regulators will treat this as horizontal consolidation. Model recommends <em>terminate</em> at the present price; counter-bid below $14.2B materially shifts the verdict.
+            Enter a deal and hit Run Analysis to generate your verdict.
           </div>
         </div>
 
@@ -2684,13 +2684,12 @@ select.fi{
       <div class="autopsy">
         <div class="autopsy-h">
           <div class="autopsy-t">Deal Autopsy <em style="font-style:normal;color:var(--ink4);font-family:'JetBrains Mono',monospace;font-size:10px;letter-spacing:0.16em;margin-left:12px">· What actually happened</em></div>
-          <div class="autopsy-sub">15 months · Sept 2022 → Dec 2023</div>
+          <div class="autopsy-sub" id="autopsySub">15 months · Sept 2022 → Dec 2023</div>
         </div>
-        <div class="autopsy-dek">
-          The model's verdict matched reality. Adobe / Figma was <em>terminated</em> in December 2023 after EU and UK regulators signalled extended Phase-II probes. Adobe paid a $1.0B break fee.
+        <div class="autopsy-dek" id="autopsyDek">
+          Run an analysis above to see the deal outcome and timeline.
         </div>
-
-        <div class="timeline">
+        <div class="timeline" id="autopsyTimeline">
           <div class="tl-row">
             <div class="tl-step">
               <div class="tl-date">15 Sept 2022</div>
@@ -3147,19 +3146,28 @@ function updateResults(data, dealName, industry, dealData) {
 
   // Verdict
   const verdictEl = document.getElementById('dealVerdict');
-  if (verdictEl) {
-    const prob = p.dealSuccessProbability;
-    let verdict, verdictClass;
-    if (prob >= 70) { verdict = ['Proceed', '']; verdictClass = 'green'; }
-    else if (prob >= 50) { verdict = ['Proceed with', 'caution.']; verdictClass = 'amber'; }
-    else { verdict = ['Do not', 'proceed.']; verdictClass = 'red'; }
-    verdictEl.setAttribute('aria-label', verdict.join(' '));
-    verdictEl.innerHTML = `<span class="wrd w1">${verdict[0]}</span>${verdict[1] ? '<br/><em><span class="wrd w2">' + verdict[1] + '</span></em>' : ''}`;
+  const deckEl = document.getElementById('dealDeck');
+  const prob = p.dealSuccessProbability;
+  let verdictLine1, verdictLine2, deckText;
+
+  if (prob >= 70) {
+    verdictLine1 = 'Proceed.'; verdictLine2 = '';
+    deckText = 'Strong completion probability with favorable market conditions and deal metrics. The model finds no critical structural issues at this price and structure.';
+  } else if (prob >= 50) {
+    verdictLine1 = 'Proceed with'; verdictLine2 = 'caution.';
+    deckText = 'Elevated risk factors identified. The deal is viable but requires careful management of the issues flagged below before proceeding to signing.';
+  } else {
+    verdictLine1 = 'Do not'; verdictLine2 = 'proceed.';
+    deckText = 'Significant risk factors present. The model identifies structural issues that materially reduce completion probability at the current price and terms.';
   }
 
-  // Deck text
-  const deckEl = document.getElementById('dealDeck');
-  if (deckEl) deckEl.textContent = p.recommendation;
+  if (verdictEl) {
+    verdictEl.setAttribute('aria-label', verdictLine1 + ' ' + verdictLine2);
+    verdictEl.innerHTML = verdictLine2
+      ? `<span class="wrd w1">${verdictLine1}</span><br/><em><span class="wrd w2">${verdictLine2}</span></em>`
+      : `<span class="wrd w1">${verdictLine1}</span>`;
+  }
+  if (deckEl) deckEl.textContent = deckText;
 
   // Probability
   const probEl = document.getElementById('probFig');
@@ -3261,6 +3269,18 @@ function updateResults(data, dealName, industry, dealData) {
       el.textContent = el.textContent.replace('Adobe / Figma', dealName);
     }
   });
+
+  // Autopsy section — update with deal name and outcome
+  const autopsyDek = document.getElementById('autopsyDek');
+  const autopsySub = document.getElementById('autopsySub');
+  if (autopsyDek) {
+    const outcome = p.dealSuccessProbability >= 65 ? 'completed' : 'faced significant obstacles';
+    autopsyDek.innerHTML = `The model predicted this deal would ${outcome}. Run this analysis to compare MergerIQ's verdict against what actually happened with <em>${dealName}</em>.`;
+  }
+  if (autopsySub) {
+    const now = new Date();
+    autopsySub.textContent = 'Analysis run ' + now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  }
 
   // Store for memo
   lastAnalysis = { data, dealName, industry };
@@ -3402,7 +3422,13 @@ document.getElementById('memoCta')?.addEventListener('click', async () => {
     });
 
     const result = await response.json();
-    const memoText = result.memo || 'Could not generate memo.';
+    const rawMemo = result.memo || 'Could not generate memo.';
+    // Strip markdown bold/headers and clean up formatting
+    const memoText = rawMemo
+      .replace(/\*\*([^*]+)\*\*/g, '$1')
+      .replace(/\*([^*]+)\*/g, '$1')
+      .replace(/#{1,3} /g, '')
+      .trim();
 
     // Show memo in a modal overlay
     const overlay = document.createElement('div');

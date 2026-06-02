@@ -38,7 +38,7 @@ Write a concise 3-paragraph memo covering:
 2. KEY RISKS: Primary concerns that could impact value creation  
 3. VALUATION ASSESSMENT: Whether the multiples are reasonable
 
-Keep it professional, data-driven, under 250 words. Use specific numbers.`
+Keep it professional, data-driven, under 250 words. Use specific numbers. Write in plain prose only — no markdown, no asterisks, no headers.`
         }]
       })
     });
