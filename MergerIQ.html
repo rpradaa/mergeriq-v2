@@ -3406,6 +3406,25 @@ function updateComps(deals, industry) {
   }).join('');
 }
 
+// ── NAICS CODE MAPPING (backend only, used for SEC EDGAR) ─
+const NAICS_MAP = {
+  'SaaS':                 ['511210'],
+  'Hardware':             ['334111', '334118'],
+  'Marketplace':          ['454110', '519130'],
+  'Gaming':               ['713210', '511210'],
+  'Fintech':              ['522320', '523130'],
+  'Healthcare':           ['621111', '622110'],
+  'Energy & Utilities':   ['221112', '221122'],
+  'Media & Telecom':      ['515110', '517311'],
+  'Pharma & Biotech':     ['325412', '541714'],
+  'Financial Services':   ['522110', '523110'],
+  'Defense & Aerospace':  ['336411', '336413'],
+};
+
+function getNaicsCodes(industry) {
+  return NAICS_MAP[industry] || [];
+}
+
 // ── SUPABASE INTEGRATION ──────────────────────────────────
 const SUPABASE_URL = 'https://fafpldipudrxlgpvnron.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImZhZnBsZGlwdWRyeGxncHZucm9uIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODA0MjA0MTksImV4cCI6MjA5NTk5NjQxOX0.sd2ocjPnhsgVpQfl2978mKhbppbLWAAjqdcrNo6UuLo';
@@ -3425,14 +3444,12 @@ function initSupabase() {
       }
     });
     sbClient.auth.getSession().then(({ data: { session } }) => {
-      console.log('Session on init:', session?.user?.email || 'none');
       if (session?.user) {
         currentUser = session.user;
         updateAuthUI(currentUser);
       }
     });
     sbClient.auth.onAuthStateChange((_event, session) => {
-      console.log('Auth state change:', _event, session?.user?.email || 'none');
       currentUser = session?.user || null;
       updateAuthUI(currentUser);
       if (currentUser && pendingDealData) {
@@ -3670,12 +3687,9 @@ function showConfirmation(msg) {
 // ── SAVE DEAL TO SUPABASE ──────────────────────────────────
 async function saveDeal(dealPayload) {
   if (!sbClient || !currentUser) {
-    console.log('saveDeal blocked: sbClient=', !!sbClient, 'currentUser=', !!currentUser);
     return;
   }
   const { data: { session } } = await sbClient.auth.getSession();
-  console.log('Saving deal, session token exists:', !!session?.access_token);
-  console.log('Saving deal:', dealPayload.dealName, 'for user:', currentUser.id);
   const { data, error } = await sbClient.from('deals').insert({
     user_id: currentUser.id,
     deal_name: dealPayload.dealName,
@@ -3688,7 +3702,6 @@ async function saveDeal(dealPayload) {
     completion_probability: dealPayload.probability,
     recommendation: dealPayload.recommendation
   }).select();
-  console.log('Save result:', data, 'Error:', error);
   if (!error) {
     showConfirmation('Deal analysis saved to your account.');
     loadMyDeals();
