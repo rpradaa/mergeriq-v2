@@ -2851,10 +2851,12 @@ setTimeout(() => {
   const loader = document.getElementById('loader');
   if (loader) loader.classList.add('gone');
   setTimeout(startCounter, 600);
-}, 2200);
+}, 3200);
 window.addEventListener('load', () => {
-  const loader = document.getElementById('loader');
-  if (loader) loader.classList.add('gone');
+  setTimeout(() => {
+    const loader = document.getElementById('loader');
+    if (loader) loader.classList.add('gone');
+  }, 1800);
 });
 
 // Probability counter — counts up to target value
